@@ -1,0 +1,13 @@
+This documentation provide for the OC ROOM AI, contains all related configurations to set up the applications
+
++ What this YouTube video to handle the PyAudio and Vosk Module setup 'https://www.youtube.com/watch?v=3Mga7_8bYpw'
++ Check if the python installed and has a version 3.9 to set up it
++ Open microphone access in Private & Access > Microphone
++ If any error that related to this; use the link:
+    - pyaudio-OSError: [Errno -9999] Unanticipated host error 'https://stackoverflow.com/questions/41518905/pyaudio-oserror-errno-9999-unanticipated-host-error'
+    - Python doesn't find model in folder 'https://stackoverflow.com/questions/73671972/python-doesnt-find-model-in-folder-at-modelmodel-name-models-model-en-0-2-if'
++ before using nltk, download the following
+    - nltk.download('punkt')
+    - nltk.download('words')
+    - nltk.download('maxent_ne_chunker')
+
