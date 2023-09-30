@@ -11,3 +11,4 @@ This documentation provide for the OC ROOM AI, contains all related configuratio
     - nltk.download('words')
     - nltk.download('maxent_ne_chunker')
 
++ Download the Vosk Model for english and filipino ( 'vosk-model-small-en-us-0.15' & 'vosk-model-tl-ph-generic-0.6' )
