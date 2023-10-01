@@ -1,0 +1,114 @@
+#:import chex kivy.utils.get_color_from_hex
+#:import Window kivy.core.window.Window
+
+MainWindow:
+
+    RoomSelections:
+        pos_hint : { 'center_x' : 0.5 , 'center_y': 0.5 }
+        size_hint : 0.8, 0.5
+
+
+
+<AIThoughts>:
+    canvas.before:
+        Rectangle:
+            pos : self.pos
+            source: None
+            size : self.size
+
+
+
+<RoomInformation>:
+    canvas.before:
+        Color:
+            rgba : 0 , 0 , 0 , 1
+        RoundedRectangle:
+            radius : ( min(Window.size) * 0.2 ,  )
+            pos : self.pos
+            size : self.size
+
+
+<RoomsLocationsPicture>:
+
+    room_name : room_name
+    room_picture : room_picture
+    floor_name : floor_name
+    floor_picture : room_picture
+
+    BoxLayout :
+        size_hint : 0.5 , 1
+        orientation: 'vertical'
+
+        Image:
+            id : room_picture
+            source : None
+            keep_data : True
+            keep_ratio : False
+            allow_stretch: True
+            size_hint : 1, 0.85
+
+        Label:
+            id : room_name
+            size_hint : 1, 0.15
+            text : "ROOM 515"
+
+    BoxLayout :
+        size_hint : 0.5 , 1
+        orientation: 'vertical'
+
+        Image:
+            id : floor_picture
+            source : None
+            keep_data : True
+            keep_ratio : False
+            allow_stretch: True
+            size_hint : 1, 0.85
+
+        Label:
+            id : floor_name
+            size_hint : 1, 0.15
+            text : "4TH FLOOR"
+
+
+
+<RoomSelections>:
+    do_scroll_x : False
+    do_scroll_y : True
+
+    MDGridLayout:
+        size_hint : 1, 1
+        md_bg_color : "black"
+        #adaptive_height : True
+        cols : 2
+        padding : dp(2)
+        spacing : dp(4)
+
+<Room>:
+    room_image : room_image
+    room_name : room_name
+
+    size_hint : 1, None
+    height : Window.size[1] * 0.2
+
+    Image:
+        id : room_image
+        source : None
+        keep_data : True
+        keep_ratio : False
+        allow_stretch: True
+        size_hint : 0.4, 1
+
+    Label:
+        id : room_name
+        size_hint : 0.6, 1
+        text : "ROOM 515"
+
+
+
+
+
+
+
+
+
+
