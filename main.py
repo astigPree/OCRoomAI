@@ -8,7 +8,9 @@ from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
 from kivy.lang.builder import Builder
 from kivy.properties import ObjectProperty
-from kivy.clock import Clock
+from kivy.clock import Clock, mainthread
+
+from threading import Thread
 
 from recognizer import AIMouth, AIEar, AIBrain, MessageAnalyzer, NewDataSaver
 
@@ -52,7 +54,7 @@ class MainWindow(MDFloatLayout) :
     room_locations : RoomsLocationsPicture = ObjectProperty()
     room_information : RoomInformation = ObjectProperty()
 
-    def loadAllNecessary(self, interval: int) :
+    def loadAllNecessary(self) :
         self.mouth = AIMouth()
         self.brain = AIBrain()
         self.ear = AIEar()
@@ -63,7 +65,7 @@ class MainWindow(MDFloatLayout) :
 class RoomAIApp(MDApp) :
 
     def on_start(self) :
-        Clock.schedule_once(self.root.loadAllNecessary)
+        Thread(target=self.root.loadAllNecessary ).start()
 
     def build(self) :
         return Builder.load_file("design.kv")

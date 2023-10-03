@@ -12,3 +12,36 @@ This documentation provide for the OC ROOM AI, contains all related configuratio
     - nltk.download('maxent_ne_chunker')
 
 + Download the Vosk Model for english and filipino ( 'vosk-model-small-en-us-0.15' & 'vosk-model-tl-ph-generic-0.6' )
+
+
+This documentation contains the activities of an artificial intelligence
+
+User Activities:
+    User Responses;
+        1. Ask 'where' is the location of the room
+        2. Ask 'who' are the creator of you
+
+    AI Responses;
+        1. Tell the information; where it located with pictures and the current teacher inside the room
+        2. Tell the information; developers information
+
+Faculty Activities:
+    User Responses;
+        1. Ask to 'update' the current teachers in the room
+
+    AI Responses;
+        1. Update the current teachers the room located
+
+Developer Activities:
+    User Responses;
+        1. Ask to 'update' maximum loop for recording
+        2. Ask to 'update' channel of microphone
+        3. Ask to 'update' frame per buffer of analyzing voices
+
+    AI Responses;
+        1. Update the current maximum loop for recording
+        2. Update the current channel of microphone
+        3. Update the current frame per buffer
+
+
+

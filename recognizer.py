@@ -121,7 +121,7 @@ class AIEar :
 
     isListening = False
     isTalking = False
-    maximumRecordLoop = 30
+    maximumRecordLoop = 50
 
     def __init__(self) :
         from vosk import Model, KaldiRecognizer
@@ -171,6 +171,16 @@ class AIEar :
     def closeMicrophone(self) :
         self.stream.close()
         self.mic.terminate()
+
+    def updateKHZT(self, value : int):
+        self.KHZT = int
+
+    def updateFrameBuffer(self, frames_per_buffer):
+        self.frames_per_buffer = frames_per_buffer
+        self.stream_read = int(self.frames_per_buffer/2)
+
+    def updateChannel(self, value : int):
+        self.channel = value
 
 
 class AIBrain :

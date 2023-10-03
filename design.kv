@@ -1,11 +1,18 @@
 #:import chex kivy.utils.get_color_from_hex
 #:import Window kivy.core.window.Window
+#:import ew kivy.uix.effectwidget
 
 MainWindow:
 
-    RoomSelections:
-        pos_hint : { 'center_x' : 0.5 , 'center_y': 0.5 }
-        size_hint : 0.8, 0.5
+    EffectWidget:
+        effects: ew.HorizontalBlurEffect(size=4.5), ew.VerticalBlurEffect(size=4.5)
+
+        Image:
+            allow_stretch: True
+            keep_data  : True
+            keep_ratio : False
+            source : "pictures/building.jpg"
+
 
 
 
