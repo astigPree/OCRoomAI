@@ -1,4 +1,3 @@
-
 import os
 import threading
 import typing as tp
@@ -17,7 +16,8 @@ class NewDataSaver :
 
         os.makedirs(self.folder, exist_ok=True)
 
-    def write(self, filename: str, act: str, value: str) :
+    @staticmethod
+    def write(filename: str, act: str, value: str) :
         with open(filename, act) as f :
             f.write(value + '\n')
 
@@ -42,21 +42,22 @@ class MessageAnalyzer :
 
     def __init__(self) :
         from nltk import word_tokenize, stem
-        from fuzzywuzzy import process
+        from fuzzywuzzy import process, fuzz
 
         self.stemmer = stem.PorterStemmer()
         self.process = process
+        self.scorer = fuzz.partial_ratio
         self.word_tokenizer = word_tokenize
 
-        with open(self.filename, 'r') as jf :
-            self.__keywords = json.load(jf)
+        # with open(self.filename, 'r') as jf :
+        #     self.__keywords = json.load(jf)
 
     def getKeywords(self, key: str) :
         return self.__keywords[key]
 
     def getRateOfText(self, key: str, words: str) :
         """Get the highest and closest keywords"""
-        return self.process.extractOne(words, self.__keywords[key])
+        return self.process.extractOne(words, self.__keywords[key], scorer=self.scorer)
 
     def stemTheWords(self, words: list[str, ...]) -> list[str, ...] :
         """Return a list of root form of each word in list; Ex: jumps -> jump """
@@ -65,6 +66,14 @@ class MessageAnalyzer :
     def splitTextToListOfWord(self, text: str) -> list[str, ...] :
         """Split the Text to list of word"""
         return self.word_tokenizer(text)
+
+    def removeSpecificWord(self, word: str, sentence: str, rate=70, stemmed=True) -> str :
+        """Remove a word in the sentence and reconstruct it again """
+        if stemmed :
+            new_sentence = self.stemTheWords(self.word_tokenizer(sentence))
+        else :
+            new_sentence = self.word_tokenizer(sentence)
+        return " ".join([accepted_word for accepted_word in new_sentence if self.scorer(word, accepted_word) < rate])
 
     @staticmethod
     def listOfWordToText(words: list[str, ...], sep=" ") -> str :
@@ -129,58 +138,104 @@ class AIEar :
 
         self.english_model = Model(model_name="vosk-model-small-en-us-0.15")
         self.fil_model = Model(model_name="vosk-model-tl-ph-generic-0.6")
+        # self.english_model = Model(r"C:\Users\63948\Desktop\PyProg\OC Room AI\EarModel\vosk-model-small-en-us-0.15\vosk-model-small-en-us-0.15")
+        # self.fil_model = Model(r"C:\Users\63948\Desktop\PyProg\OC Room AI\EarModel\vosk-model-tl-ph-generic-0.6\vosk-model-tl-ph-generic-0.6")
 
         self.english_recognizer = KaldiRecognizer(self.english_model, self.KHZT)
         self.fil_recognizer = KaldiRecognizer(self.fil_model, self.KHZT)
 
         self.mic = PyAudio()
-        self.stream = self.mic.open(format=paInt16, rate=self.KHZT, channels=self.channel, input=True,
+        self.stream = self.mic.open(format=paInt16, rate=16000, channels=self.channel, input=True,
                                     frames_per_buffer=self.frames_per_buffer)
 
-    def captureVoice(self, language='english') -> tp.Union[str, None] :
+    def closeMicrophone(self) :
+        if self.stream and self.mic :
+            self.stream.close()
+            self.mic.terminate()
+
+    def updateKHZT(self, value: int) :
+        self.KHZT = int
+
+    def updateFrameBuffer(self, frames_per_buffer) :
+        self.frames_per_buffer = frames_per_buffer
+        self.stream_read = int(self.frames_per_buffer / 2)
+
+    def updateChannel(self, value: int) :
+        self.channel = value
+
+    def captureVoice(self, language='english', waiting_time=None) -> tp.Union[str, None] :
         """This functions might return empty string and to not get stuck it has a maximum loop to read stream"""
         self.isListening = True
         self.stream.start_stream()
+        text = ""
 
-        if language == "english" :
-            for _ in range(self.maximumRecordLoop) :
-                data = self.stream.read(num_frames=self.stream_read, exception_on_overflow=False)
+        for _ in range(self.maximumRecordLoop if not waiting_time else waiting_time) :
+            data = self.stream.read(num_frames=self.stream_read, exception_on_overflow=False)
+            if language == "english" :
                 if self.english_recognizer.AcceptWaveform(data) :
                     text = self.english_recognizer.Result()[14 :-3]
-                    print(f"Text : {text}")
-                    if len(text) :
-                        self.stream.stop_stream()
-                        self.isListening = False
-                        return text
-            print("[!] OSError: [Errno -9981] Input overflowed")
-        else :
-            for _ in range(self.maximumRecordLoop) :
-                data = self.stream.read(num_frames=self.stream_read, exception_on_overflow=False)
+                    print(f"English Text : {text}")
+                    if len(text) : break
+            else :
                 if self.fil_recognizer.AcceptWaveform(data) :
                     text = self.fil_recognizer.Result()[14 :-3]
-                    if len(text) :
-                        self.stream.stop_stream()
-                        self.isListening = False
-                        return text
+                    print(f"Filipino Text : {text}")
+                    if len(text) : break
+
+        if len(text) :
+            self.stream.stop_stream()
+            self.isListening = False
+            return text
+        else :
             print("[!] OSError: [Errno -9981] Input overflowed")
+            self.stream.stop_stream()
+            self.isListening = False
+            return None
+
+    def captureVoiceContinues(self, language="filipino", key="@#$") -> tuple[str, bool] :
+        # A function that has loop of recording until there is no sound
+        # Return sentences and boolean if key is in the sentences
+        self.isListening = True
+        self.stream.start_stream()
+
+        past_text = ""
+        keep_recording = True
+
+        if language == "english" :
+            while keep_recording :
+                data = self.stream.read(num_frames=self.stream_read, exception_on_overflow=False)
+                if self.english_recognizer.AcceptWaveform(data) :
+                    current_text = self.english_recognizer.Result()[14 :-3]
+
+                    if not past_text :  # Check if past_text is empty then set a current_text
+                        past_text = current_text
+
+                    if past_text in current_text :
+                        past_text = current_text
+                    else :
+                        keep_recording = False
+
+        else :
+            while keep_recording :
+                data = self.stream.read(num_frames=self.stream_read, exception_on_overflow=False)
+                if self.fil_recognizer.AcceptWaveform(data) :
+                    current_text = self.fil_recognizer.Result()[14 :-3]
+                    print(f"Present Text : {current_text}")
+
+                    if not past_text :  # Check if past_text is empty then set a current_text
+                        past_text = current_text
+
+                    if past_text in current_text :  # Check if past_text in current_text
+                        past_text = current_text
+                    else :
+                        keep_recording = False
+
+                    print(f"Past Text : {past_text}")
 
         self.stream.stop_stream()
         self.isListening = False
-        return None
 
-    def closeMicrophone(self) :
-        self.stream.close()
-        self.mic.terminate()
-
-    def updateKHZT(self, value : int):
-        self.KHZT = int
-
-    def updateFrameBuffer(self, frames_per_buffer):
-        self.frames_per_buffer = frames_per_buffer
-        self.stream_read = int(self.frames_per_buffer/2)
-
-    def updateChannel(self, value : int):
-        self.channel = value
+        return (past_text, True) if key in past_text else (past_text, bool)
 
 
 class AIBrain :
@@ -190,8 +245,9 @@ class AIBrain :
     folder = "AI Model"
     model = ""
 
-    def create_brain(self, file_json: str, functions: dict) :
+    def create_brain(self, model: str, file_json: str, functions: dict) :
         from neuralintents import GenericAssistant
+        self.model = model
         # if you want to have return value in decide method , put empty dictionary in functions parameter
         model_name = os.path.join(self.folder, self.model)  # Directory , Model
         self.__decision = GenericAssistant(file_json, intent_methods=functions, model_name=model_name)
@@ -206,11 +262,36 @@ class AIBrain :
 
 
 if __name__ == "__main__" :
+    # pass
     rec = AIEar()
     mouth = AIMouth()
     print("starting ............ ")
     text = rec.captureVoice(language='filipino')
     print(f"Result :{text}")
     mouth.talk(text)
-
     rec.closeMicrophone()
+    text = "gwapo mo talaga pre ways"
+    #
+    # mes = MessageAnalyzer()
+    # me2 = MessageAnalyzer()
+    # # with open("wise_data/command_keywords.json", 'r') as jf:
+    # #     data = json.load(jf)
+    #
+    # a = mes.removeSpecificWord("wise", text, stemmed=False)
+    # print(a)
+
+    # mes = MessageAnalyzer()
+    # words = [
+    #     "Switch screens",
+    #     "Replace the screen",
+    #     "Change the display",
+    #     "Swap the screen",
+    #     "Alternate screens",
+    #     "palit screen",
+    # ]
+    # for word in words:
+    #     tok = mes.splitTextToListOfWord(word)
+    #     stem = mes.stemTheWords(tok)
+    #     print(f"\"{' '.join(stem)}\",")
+    #     # print(f"Tokenized : {tok}")
+    #     # print(f"Stemmed : {stem}")

@@ -6,12 +6,19 @@ This documentation provide for the OC ROOM AI, contains all related configuratio
 + If any error that related to this; use the link:
     - pyaudio-OSError: [Errno -9999] Unanticipated host error 'https://stackoverflow.com/questions/41518905/pyaudio-oserror-errno-9999-unanticipated-host-error'
     - Python doesn't find model in folder 'https://stackoverflow.com/questions/73671972/python-doesnt-find-model-in-folder-at-modelmodel-name-models-model-en-0-2-if'
+    - No text seen in vosk model 'https://stackoverflow.com/questions/69696092/vosk-empty-text-outputjava'
 + before using nltk, download the following
     - nltk.download('punkt')
     - nltk.download('words')
     - nltk.download('maxent_ne_chunker')
 
 + Download the Vosk Model for english and filipino ( 'vosk-model-small-en-us-0.15' & 'vosk-model-tl-ph-generic-0.6' )
++ Outside Libraries;
+    - pip install word2number
+    - pip install neuralintents
+    - pip install PyAudio
+    - pip install pyttsx3
+    - pip install vosk
 
 
 This documentation contains the activities of an artificial intelligence
@@ -42,6 +49,27 @@ Developer Activities:
         1. Update the current maximum loop for recording
         2. Update the current channel of microphone
         3. Update the current frame per buffer
+
+
+
+This documentation contains the algorithm of the applications
+
+1. Check the current command
+2. If command stop the continuation of the program, wait till owner permission
+3. If none then continue to main activity
+4. User, Faculty, Developer enter input by speech
+5. Check if the input is in the built-in commands
+6. If in the commands then execute it and disregard future activities
+7. If not then proceed to identification if 'who' or 'where' using neural_intents models
+8. If the input intent is 'where' identify the list of rooms in the input, if not provided ask again ( go back to 1 )
+9. If the input intent is 'who' identify again using neural_intents models to identify the input 'who' intent
+10. If the input is identified then show the information or the activity that the application identified
+11. Wait for a minute before change back to main screen or wait till the User, Faculty, Developer input tru speech
+
+
+
+
+
 
 
 
