@@ -29,7 +29,7 @@ MainWindow:
         MDGridLayout:
             adaptive_height: True
             cols : 1
-            padding : [ dp(15) , dp(10) , dp(5) , dp(10) ]
+            padding : [ dp(25) , dp(10) , dp(5) , dp(10) ]
 
             AIContentLabel:
                 id : display_talking
@@ -48,11 +48,38 @@ MainWindow:
                 size : self.size
                 radius : ( min(self.size) * 0.030 ,)
 
+    OCLogo:
+        size_hint: 0.2 , 0.57
+        pos_hint: { 'x' : 0.02 , 'y': 0.4 }
+
+    Image:
+        size_hint : 0.2 , 0.3
+        pos_hint: { 'x' : 0.02 , 'y': 0.08 }
+
+    AIActivity:
+        size_hint : 0.2 , 0.05
+        pos_hint: { 'x' : 0.02 , 'y': 0.02 }
+
+
 
 # ------------------- Screen Holder ------------
 <ContentWindow>:
 
 # ------------------- Additional Widgets ----------
+<AIActivity@Label>:
+    canvas.before:
+        Color:
+            rgba : chex('efefee')
+        RoundedRectangle:
+            pos: self.pos
+            size : self.size
+            radius : ( min(self.size) * 0.5 ,)
+
+    text : "T A L K I N G"
+    font_size : min(root.parent.size) * 0.03
+    font_name : "title_font"
+    color : chex('#620609') # Color should be different based on the activity
+
 <AIContentLabel@MDLabel>:
     color : "black"
     font_name : "ai_font"
@@ -63,3 +90,17 @@ MainWindow:
     halign : 'left'
     valign: 'top'
 
+<OCLogo@BoxLayout>:
+    orientation : 'vertical'
+
+    Image:
+        source : "pictures/osmenia logo.png"
+        size_hint : 1 , 0.5
+        keep_ratio : False
+        allow_stretch : True
+
+    Image:
+        source : "pictures/department logo.png"
+        size_hint : 1 , 0.5
+        keep_ratio : False
+        allow_stretch : True

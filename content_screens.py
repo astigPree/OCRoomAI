@@ -29,7 +29,7 @@ class LocationScreenInformation(Screen) :
     information : LocationInformationContainer = ObjectProperty()
 
     def on_kv_post(self, base_widget):
-        self.image1.locationName.text = "Mrs. Violeta B. Montecalvo"
+        self.image1.locationName.text = "Audio-Visual Room"
         self.information.title.text = "INFORMATION"
         self.information.info.text = "    This room is an inventory room for all the un used supply"
 
