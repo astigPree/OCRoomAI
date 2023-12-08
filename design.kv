@@ -1,213 +1,65 @@
 #:import chex kivy.utils.get_color_from_hex
-#:import Window kivy.core.window.Window
-#:import ew kivy.uix.effectwidget
+
 
 MainWindow:
 
-    manager : manager.__self__
-    emotion : emotion
-    thoughts : thoughts
-
-    EffectWidget:
-        effects: ew.HorizontalBlurEffect(size=4.5), ew.VerticalBlurEffect(size=4.5)
-
-        Image:
-            allow_stretch: True
-            keep_data  : True
-            keep_ratio : False
-            source : "pictures/building.jpg"
-
-    BoxLayout:
-        orientation : 'vertical'
-        size_hint : 1 , 1
-        pos_hint : { 'center_x' : 0.5, 'center_y' : 0.5 }
-        spacing : dp(5)
-
-        BoxLayout:
-            size_hint : 1, 0.55
-            spacing : dp(1)
-
-            AIEmotions:
-                id : emotion
-                size_hint : 0.3 , 1
-
-            AIThoughts:
-                id : thoughts
-                size_hint : 0.7 , 1
-
-        ScreenManager:
-            size_hint : 1, 0.45
-            id : manager
-
-
-
-# -------------------- Main Screen Widgets ----------------------- #
-
-<AIEmotions>:
-    image : image
-    name_holder : name_holder
-    status : status
-
-    Image:
-        id : image
-        pos_hint : { 'center_x' : 0.5 , 'center_y' : 0.5 }
-        keep_ratio : False
-        keep_data : False
-        allow_stretch : True
-
-
-    BoxLayout:
-        orientation : 'vertical'
-        pos_hint : { 'center_x' : 0.5 , 'y' : 0 }
-        size_hint : 1 , 0.3
-
-        Button:
-            id : status
-            text : "T A L K I N G"
-
-        Button:
-            id : name_holder
-            text : "W  I  S  E"
-
-
-
-<AIThoughts>:
-    image : image
-    ai_input : ai_input
-
-    Image:
-        id : image
-        size_hint : 1 , 1
-        pos_hint : { 'center_x' : 0.5 , 'center_y' : 0.5 }
-        opacity : 0.5
-
-    Label:
-        id : ai_input
-        size_hint : 1 , 1
-        pos_hint : { 'center_x' : 0.5 , 'center_y' : 0.5 }
-
-
-
-# -------------------- Faculty Screen ----------------------- #
-<FacultyScreen>:
-
-
-# -------------------- DeveloperScreen Screen ----------------------- #
-<DeveloperScreen>:
-
-
-
-# -------------------- Information Screen ----------------------- #
-<InformationScreen>:
-    room_locations: room_locations.__self__
-
-    RoomsLocationsPicture:
-        id : room_locations
-        size_hint: 1 , 1
-        pos_hint : { "center_x": 0.5 , "center_y": 0.5 }
-
-
-
-<RoomsLocationsPicture>:
-
-    room_name : room_name
-    room_picture : room_picture
-    floor_name : floor_name
-    floor_picture : room_picture
-
-    BoxLayout :
-        size_hint : 0.5 , 1
-        orientation: 'vertical'
-
-        Image:
-            id : room_picture
-            source : None
-            keep_data : True
-            keep_ratio : False
-            allow_stretch: True
-            size_hint : 1, 0.85
-
-        Label:
-            id : room_name
-            size_hint : 1, 0.15
-            text : "ROOM 515"
-
-    BoxLayout :
-        size_hint : 0.5 , 1
-        orientation: 'vertical'
-
-        Image:
-            id : floor_picture
-            source : None
-            keep_data : True
-            keep_ratio : False
-            allow_stretch: True
-            size_hint : 1, 0.85
-
-        Label:
-            id : floor_name
-            size_hint : 1, 0.15
-            text : "4TH FLOOR"
-
-
-# -------------------- User Screen ----------------------- #
-
-<UserScreen>:
-
-    RoomSelections:
-        size_hint :  1, 1
-
-
-<RoomSelections>:
-    do_scroll_x : False
-    do_scroll_y : True
-
-    MDGridLayout:
-        size_hint : 1, 1
-        md_bg_color : 0 ,0 , 0 ,0
-        adaptive_height : True
-        cols : 2
-        padding : dp(2)
-        spacing : dp(4)
-
-<Room>:
-    room_image : room_image
-    room_name : room_name
-
-    size_hint : 1, None
-    height : Window.size[1] * 0.2
-
-    Image:
-        id : room_image
-        source : None
-        keep_data : True
-        keep_ratio : False
-        allow_stretch: True
-        size_hint : 0.4, 1
-
-    Label:
-        id : room_name
-        size_hint : 0.6, 1
-        text : "ROOM 515"
-
-
-<RoomInformation>:
     canvas.before:
         Color:
-            rgba : 0 , 0 , 0 , 1
-        RoundedRectangle:
-            radius : ( min(Window.size) * 0.2 ,  )
-            pos : self.pos
+            rgba : chex('b98d8f')
+        Rectangle:
+            pos: self.pos
             size : self.size
 
+    content : content
+    display_talking : display_talking
+
+    ScrollView:
+        size_hint : None, None
+        size : root.size[0] * 0.72 , root.size[1] * 0.23
+        pos : root.size[0] * 0.255 , root.size[1] * 0.03
+
+        canvas.before:
+            Color:
+                rgba : chex('efefee')
+            RoundedRectangle:
+                pos : self.pos
+                size : self.size
+                radius : ( min(self.size) *0.24,)
+
+        MDGridLayout:
+            adaptive_height: True
+            cols : 1
+            padding : [ dp(15) , dp(10) , dp(5) , dp(10) ]
+
+            AIContentLabel:
+                id : display_talking
+
+    ContentWindow:
+        id : content
+        size_hint : None , None
+        size : root.size[0] * 0.75 , root.size[1] * 0.70
+        pos : root.size[0] * 0.24, root.size[1] * 0.28
+
+        canvas.before:
+            Color:
+                rgba : chex('#620609')
+            RoundedRectangle:
+                pos: self.pos
+                size : self.size
+                radius : ( min(self.size) * 0.030 ,)
 
 
+# ------------------- Screen Holder ------------
+<ContentWindow>:
 
-
-
-
-
-
-
-
+# ------------------- Additional Widgets ----------
+<AIContentLabel@MDLabel>:
+    color : "black"
+    font_name : "ai_font"
+    font_size : min(root.parent.parent.size) * 0.15
+    size_hint : 1 , None
+    height : self.texture_size[1]
+    markup : True
+    halign : 'left'
+    valign: 'top'
 

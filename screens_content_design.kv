@@ -1,0 +1,124 @@
+
+
+# ------------------------ Guest Screens ----------------------
+<LocationImageContainer>:
+    orientation : 'vertical'
+    locationName : locationName
+    locationImage : locationImage
+    spacing : min(self.size) * 0.05
+
+    BoxLayout :
+        size_hint : 1 , 0.9
+        padding : dp(20)
+        canvas.before:
+            Color:
+                rgba : chex('f0f3f4')
+            RoundedRectangle:
+                pos : self.pos
+                size : self.size
+                radius : ( min(self.size) * 0.05, )
+
+        Image:
+            id : locationImage
+            allow_stretch : True
+            keep_ratio : False
+            source : 'pictures/2.jpg'
+            
+    Label:
+        id : locationName
+        size_hint : 1 , 0.1
+        text : "ROOM 501"
+        font_name : 'title_font'
+        font_size : min(root.size) * 0.1
+
+
+
+
+<LocationInformationContainer>:
+    orientation: 'vertical'
+    padding : [ dp(5) , dp(0) , dp(5) , dp(0) ]
+
+    title : title
+    info : info
+
+    canvas.before:
+        Color:
+            rgba : chex('f0f3f4')
+        RoundedRectangle:
+            pos : self.pos
+            size : self.size
+            radius : ( min(self.size) * 0.05, )
+
+    Label:
+        id : title
+        size_hint : 1 , None
+        height: self.texture_size[1] + ( min(root.size)  * 0.1 )
+		font_size : min(root.size) * 0.1
+        text : "DIRECTIONS"
+        font_name : "title_font"
+        color : "black"
+
+    Label:
+        id : info
+        size_hint : 1 , None
+        text : "[font=title_font]1.[/font] hsdfdsdsfdssdfsd  sdafd jfjs dfd sasdjkjk fd \n[font=title_font]2.[/font] hdshdshfdsfd hdsa \n[font=title_font]3.[/font] jdsfhdshsdhld"
+        font_name : "content_font"
+        height: self.texture_size[1]
+		text_size: self.width, None
+        color : "black"
+        markup : True
+        font_size : min(root.size) * 0.07
+
+    Widget:
+
+
+<LocationScreenInformation>:
+    opacity : 0
+    image1 : image1
+    image2 : image2
+    directions : directions
+    information : information
+
+    FloatLayout:
+
+        BoxLayout:
+            orientation : 'vertical'
+            pos_hint : { "x" : 0.05 , "center_y" : 0.5 }
+            size_hint : 0.55 , 0.9
+            spacing : min(self.size) * 0.04
+
+            LocationImageContainer:
+                id : image1
+                size_hint : 0.5 , 1
+
+
+            LocationImageContainer:
+                id : image2
+                size_hint : 0.5 , 1
+
+        LocationInformationContainer:
+            id : directions
+            pos_hint : { "x" : 0.4 , "center_y" : 0.5}
+            size_hint : 0.26 , 0.9
+
+        LocationInformationContainer:
+            id : information
+            pos_hint : { "x" : 0.68 , "center_y" : 0.5}
+            size_hint : 0.26 , 0.9
+
+
+<GuestScreen>:
+
+    screens_handler : screens_handler
+
+    ScreenManager:
+        id : screens_handler
+
+
+
+<FacultyScreen>:
+
+
+<DeveloperScreen>:
+
+
