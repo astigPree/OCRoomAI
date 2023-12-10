@@ -1,0 +1,21 @@
+{
+  "instructor 1" : {
+      "person" :  "instructor name",
+      "picture" : "picture path",
+      "information" : "brief information about the instructor",
+      "locations": {
+        "office" : [ "time start" , "time end"],
+        "avr" : ["time start" , "time end"]
+      }
+    },
+  "instructor 2" : {
+      "person" :  "instructor name",
+      "picture" : "picture path",
+      "information" : "brief information about the instructor",
+      "locations": {
+        "office" : [ "time start" , "time end"],
+        "avr" : ["time start" , "time end"]
+      }
+    }
+}
+

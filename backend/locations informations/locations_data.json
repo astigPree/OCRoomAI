@@ -1,0 +1,16 @@
+{
+  "room 1": {
+      "name" : "building name",
+      "building picture" : "building picture",
+      "floor picture" : "floor picture",
+      "brief information" : [ "information about building" , 10 ],
+      "directions" : [ "step by step allocations" , 10]
+    },
+  "room 2": {
+      "name" : "building name",
+      "building picture" : "building picture",
+      "floor picture" : "floor picture",
+      "brief information" : [ "information about building" , 10 ],
+      "directions" : [ "step by step allocations" , 10]
+    }
+}
