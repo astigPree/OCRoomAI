@@ -79,6 +79,14 @@
     directions : directions
     information : information
 
+    canvas.before:
+        Color:
+            rgba : chex('#620609')
+        RoundedRectangle:
+            pos: self.pos
+            size : self.size
+            radius : ( min(self.size) * 0.030 ,)
+
     FloatLayout:
 
         BoxLayout:

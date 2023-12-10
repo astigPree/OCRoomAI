@@ -55,6 +55,7 @@ class GuestScreen(Screen) :
         self.animateChangingScreens()
 
     def animateChangingScreens(self) :
+
         def animate(pos: int) :
             if self.__okey_to_animate:
                 self.screens_handler.current = self.screens_names[pos]

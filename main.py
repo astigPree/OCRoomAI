@@ -1,5 +1,5 @@
-from kivy.config import Config
-Config.set('graphics', 'fullscreen', 'auto')
+# from kivy.config import Config
+# Config.set('graphics', 'fullscreen', 'auto')
 
 from kivymd.app import MDApp
 from kivy.uix.floatlayout import FloatLayout
@@ -11,7 +11,10 @@ from kivy.lang.builder import Builder
 from kivy.core.text import LabelBase
 from kivy.clock import Clock
 
+from threading import Thread
+
 from content_screens import GuestScreen, FacultyScreen, DeveloperScreen
+
 
 
 class ContentWindow(ScreenManager) :
@@ -26,11 +29,14 @@ class ContentWindow(ScreenManager) :
 class MainWindow(FloatLayout) :
     display_talking: Label = ObjectProperty(None)
     content: ContentWindow = ObjectProperty(None)
+    activity : Label = ObjectProperty(None)
 
     __ai_talking: str = StringProperty("This is a test of the UI Display asjdf sdfjo jsdf jsdafj sadjo joojds oj dsf")
 
+    from backend.algo_recognation import recognizeAlgo
+
     def on_kv_post(self, base_widget):
-        Clock.schedule_once(lambda x : self.animateDisplayTalking(3) , 1)
+        Thread(target=self.recognizeAlgo).start()
 
     def animateDisplayTalking(self, talking_time: int) :
         def Animate(speed: float) :
@@ -45,9 +51,11 @@ class MainWindow(FloatLayout) :
         speed = talking_time / len(self.__ai_talking)
         Clock.schedule_once(lambda x : Animate(speed), speed)
 
-    def updateAITalking(self, text : str):
+    def updateAITalking(self, text : str , talking_speed : int):
         # TODO: before changing the ai_talking , check if the AI is done talking by checking if the ai_talking is empty string
         self.__ai_talking = text
+        Clock.schedule_once(lambda x : self.animateDisplayTalking(talking_speed))
+
 
 
 class RoomAIApp(MDApp) :
