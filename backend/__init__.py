@@ -1,0 +1,1 @@
+from .algo_recognation import recognizeAlgo
