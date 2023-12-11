@@ -1,0 +1,75 @@
+{
+  "justine" : {
+      "person" :  "Sir Justine Aban",
+      "picture" : "picture path",
+      "information" : "brief information about the instructor",
+      "locations": {
+        "office" : [ "time start-time end", "time start-time end"],
+        "avr" : ["time start-time end", "time start-time end"]
+      }
+    },
+  "norle" : {
+      "person" :  "Sir Norle Magcayan",
+      "picture" : "picture path",
+      "information" : "brief information about the instructor",
+      "locations": {
+        "office" : [ "time start-time end", "time start-time end"],
+        "avr" : ["time start-time end","time start-time end"]
+      }
+    },
+  "joel" : {
+      "person" :  "Sir Joel Salidaga",
+      "picture" : "picture path",
+      "information" : "brief information about the instructor",
+      "locations": {
+        "office" : [ "time start-time end", "time start-time end"],
+        "avr" : ["time start-time end","time start-time end"]
+      }
+    },
+  "anave" : {
+      "person" :  "Mrs. Jessica Anave",
+      "picture" : "picture path",
+      "information" : "brief information about the instructor",
+      "locations": {
+        "office" : [ "time start-time end", "time start-time end"],
+        "avr" : ["time start-time end","time start-time end"]
+      }
+    },
+  "viole" : {
+      "person" :  "Mrs. Violeta Montecalvo",
+      "picture" : "picture path",
+      "information" : "brief information about the instructor",
+      "locations": {
+        "office" : [ "time start-time end", "time start-time end"],
+        "avr" : ["time start-time end","time start-time end"]
+      }
+    },
+  "lai" : {
+      "person" :  "Ms. Laila Deito",
+      "picture" : "picture path",
+      "information" : "brief information about the instructor",
+      "locations": {
+        "office" : [ "time start-time end", "time start-time end"],
+        "avr" : ["time start-time end","time start-time end"]
+      }
+    },
+  "jov" : {
+      "person" :  "Ms. Jovelyn Patalinghug",
+      "picture" : "picture path",
+      "information" : "brief information about the instructor",
+      "locations": {
+        "office" : [ "time start-time end", "time start-time end"],
+        "avr" : ["time start-time end","time start-time end"]
+      }
+    },
+  "ento" : {
+      "person" :  "Mrs. Josefina Sarmiento",
+      "picture" : "picture path",
+      "information" : "brief information about the instructor",
+      "locations": {
+        "office" : [ "time start-time end", "time start-time end"],
+        "avr" : ["time start-time end","time start-time end"]
+      }
+    }
+}
+

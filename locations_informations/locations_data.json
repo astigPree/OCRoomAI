@@ -1,0 +1,138 @@
+{
+  "501": {
+      "name" : "Room 501",
+      "floor" : "1st Floor",
+      "building picture" : "building picture",
+      "floor picture" : "floor picture",
+      "brief information" : [ "information about building" , 10 ],
+      "directions" : [ "step by step allocations" , 10]
+    },
+  "avr": {
+      "name" : "Audio-Visual Room",
+      "floor" : "1st Floor",
+      "building picture" : "building picture",
+      "floor picture" : "floor picture",
+      "brief information" : [ "information about building" , 10 ],
+      "directions" : [ "step by step allocations" , 10]
+    },
+  "502": {
+      "name" : "Room 502",
+      "floor" : "1st Floor",
+      "building picture" : "building picture",
+      "floor picture" : "floor picture",
+      "brief information" : [ "information about building" , 10 ],
+      "directions" : [ "step by step allocations" , 10]
+    },
+  "office": {
+      "name" : "Office of the Dean and Faculty",
+      "floor" : "1st Floor",
+      "building picture" : "building picture",
+      "floor picture" : "floor picture",
+      "brief information" : [ "information about building" , 10 ],
+      "directions" : [ "step by step allocations" , 10]
+    },
+  "505": {
+      "name" : "Room 505",
+      "floor" : "1st Floor",
+      "building picture" : "building picture",
+      "floor picture" : "floor picture",
+      "brief information" : [ "information about building" , 10 ],
+      "directions" : [ "step by step allocations" , 10]
+    },
+  "506": {
+      "name" : "Room 506",
+      "floor" : "1st Floor",
+      "building picture" : "building picture",
+      "floor picture" : "floor picture",
+      "brief information" : [ "information about building" , 10 ],
+      "directions" : [ "step by step allocations" , 10]
+    },
+  "507": {
+      "name" : "Room 507",
+      "floor" : "1st Floor",
+      "building picture" : "building picture",
+      "floor picture" : "floor picture",
+      "brief information" : [ "information about building" , 10 ],
+      "directions" : [ "step by step allocations" , 10]
+    },
+  "508": {
+      "name" : "Room 508",
+      "floor" : "1st Floor",
+      "building picture" : "building picture",
+      "floor picture" : "floor picture",
+      "brief information" : [ "information about building" , 10 ],
+      "directions" : [ "step by step allocations" , 10]
+    },
+  "510": {
+      "name" : "Room 510",
+      "floor" : "1st Floor",
+      "building picture" : "building picture",
+      "floor picture" : "floor picture",
+      "brief information" : [ "information about building" , 10 ],
+      "directions" : [ "step by step allocations" , 10]
+    },
+  "509": {
+      "name" : "Room 509",
+      "floor" : "1st Floor",
+      "building picture" : "building picture",
+      "floor picture" : "floor picture",
+      "brief information" : [ "information about building" , 10 ],
+      "directions" : [ "step by step allocations" , 10]
+    },
+  "511": {
+      "name" : "Room 511",
+      "floor" : "1st Floor",
+      "building picture" : "building picture",
+      "floor picture" : "floor picture",
+      "brief information" : [ "information about building" , 10 ],
+      "directions" : [ "step by step allocations" , 10]
+    },
+  "512": {
+      "name" : "Room 512",
+      "floor" : "1st Floor",
+      "building picture" : "building picture",
+      "floor picture" : "floor picture",
+      "brief information" : [ "information about building" , 10 ],
+      "directions" : [ "step by step allocations" , 10]
+    },
+  "513": {
+      "name" : "Room 513",
+      "floor" : "1st Floor",
+      "building picture" : "building picture",
+      "floor picture" : "floor picture",
+      "brief information" : [ "information about building" , 10 ],
+      "directions" : [ "step by step allocations" , 10]
+    },
+  "515": {
+      "name" : "Room 515",
+      "floor" : "1st Floor",
+      "building picture" : "building picture",
+      "floor picture" : "floor picture",
+      "brief information" : [ "information about building" , 10 ],
+      "directions" : [ "step by step allocations" , 10]
+    },
+  "516": {
+      "name" : "Room 516",
+      "floor" : "1st Floor",
+      "building picture" : "building picture",
+      "floor picture" : "floor picture",
+      "brief information" : [ "information about building" , 10 ],
+      "directions" : [ "step by step allocations" , 10]
+    },
+  "517": {
+      "name" : "Room 517",
+      "floor" : "1st Floor",
+      "building picture" : "building picture",
+      "floor picture" : "floor picture",
+      "brief information" : [ "information about building" , 10 ],
+      "directions" : [ "step by step allocations" , 10]
+    },
+  "radio": {
+      "name" : "Radio Natin Station",
+      "floor" : "1st Floor",
+      "building picture" : "building picture",
+      "floor picture" : "floor picture",
+      "brief information" : [ "information about building" , 10 ],
+      "directions" : [ "step by step allocations" , 10]
+    }
+}
