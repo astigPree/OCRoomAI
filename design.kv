@@ -1,19 +1,15 @@
 #:import chex kivy.utils.get_color_from_hex
-
+#:import ew kivy.uix.effectwidget
 
 MainWindow:
-
-    canvas.before:
-        Color:
-            rgba : chex('efefee')
-        Rectangle:
-            pos: self.pos
-            size : self.size
-            source : "pictures/building.jpg"
 
     content : content
     display_talking : display_talking
     activity : activity
+    picture : picture
+
+    BuildingPicture:
+        id : picture
 
     ScrollView:
         size_hint : None, None
@@ -63,6 +59,23 @@ MainWindow:
 <ContentWindow>:
 
 # ------------------- Additional Widgets ----------
+<BuildingPicture@EffectWidget>:
+	effects: ew.HorizontalBlurEffect(size=self.parent.size_effect), ew.VerticalBlurEffect(size=self.parent.size_effect)
+	picture : picture
+
+	Image :
+
+		canvas.before:
+			Color:
+				rgb : 0 , 0 , 0
+			Rectangle:
+				pos : self.pos
+				size : self.size
+
+		id : picture
+		keep_ratio : False
+		allow_stretch : True
+
 <AIActivity@Label>:
     canvas.before:
         Color:
