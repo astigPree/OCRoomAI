@@ -1,47 +1,39 @@
 {
   "justine" : {
-      "person" :  "Sir Justine Aban",
+      "person" :  "Justin Aban",
       "picture" : "picture path",
-      "information" : "brief information about the instructor",
+      "information" : "    Teacher who is also a software engineer is an individual with a unique combination of skills and expertise. This person typically possesses a background in software engineering, which includes knowledge of programming languages, software development methodologies, and a deep understanding of computer science principles.",
       "locations": {
-        "office" : [ "time start-time end", "time start-time end"],
-        "avr" : ["time start-time end", "time start-time end"]
+        "avr" : ["13:00:00-15:30:00"]
       }
     },
   "norle" : {
       "person" :  "Sir Norle Magcayan",
       "picture" : "picture path",
-      "information" : "brief information about the instructor",
+      "information" : "    As a Master Programming Instructor, this individual stands as an expert in a wide array of programming languages, frameworks, and software development methodologies. With a deep and versatile understanding of programming, they bring a wealth of knowledge and practical experience to the classroom.",
       "locations": {
-        "office" : [ "time start-time end", "time start-time end"],
-        "avr" : ["time start-time end","time start-time end"]
+        "501" : ["13:00:00-15:30:00"]
       }
     },
   "joel" : {
       "person" :  "Sir Joel Salidaga",
       "picture" : "picture path",
-      "information" : "brief information about the instructor",
+      "information" : "    As a Computer Hardware Instructor, this individual possesses a deep understanding of the intricate components that form the foundation of computing systems. Their expertise extends to the design, assembly, maintenance, and troubleshooting of computer hardware. With a passion for sharing this knowledge, the instructor plays a crucial role in preparing students for careers in CSIT, computer engineering, and related fields.",
       "locations": {
-        "office" : [ "time start-time end", "time start-time end"],
-        "avr" : ["time start-time end","time start-time end"]
       }
     },
   "anave" : {
       "person" :  "Mrs. Jessica Anave",
       "picture" : "picture path",
-      "information" : "brief information about the instructor",
+      "information" : "    As a Software Tools Instructor, this individual is a specialist in guiding students through the effective utilization of various software tools that are integral to the field of technology and software development. With a keen understanding of the practical applications of these tools, the instructor equips students with the skills necessary for efficient workflow and project development.",
       "locations": {
-        "office" : [ "time start-time end", "time start-time end"],
-        "avr" : ["time start-time end","time start-time end"]
       }
     },
   "viole" : {
-      "person" :  "Mrs. Violeta Montecalvo",
+      "person" :  "Violeta Monticalvo",
       "picture" : "picture path",
-      "information" : "brief information about the instructor",
+      "information" : "    A teacher who holds the positions of a dean and Thesis Instructor, this professional embodies a unique blend of administrative leadership and hands-on academic engagement. Operating at the intersection of institutional governance and student mentorship, they play a pivotal role in shaping both the administrative policies and the academic experiences of students, particularly in the realm of thesis work. ",
       "locations": {
-        "office" : [ "time start-time end", "time start-time end"],
-        "avr" : ["time start-time end","time start-time end"]
       }
     },
   "lai" : {
@@ -49,8 +41,6 @@
       "picture" : "picture path",
       "information" : "brief information about the instructor",
       "locations": {
-        "office" : [ "time start-time end", "time start-time end"],
-        "avr" : ["time start-time end","time start-time end"]
       }
     },
   "jov" : {
@@ -58,8 +48,6 @@
       "picture" : "picture path",
       "information" : "brief information about the instructor",
       "locations": {
-        "office" : [ "time start-time end", "time start-time end"],
-        "avr" : ["time start-time end","time start-time end"]
       }
     },
   "ento" : {
@@ -67,8 +55,6 @@
       "picture" : "picture path",
       "information" : "brief information about the instructor",
       "locations": {
-        "office" : [ "time start-time end", "time start-time end"],
-        "avr" : ["time start-time end","time start-time end"]
       }
     }
 }

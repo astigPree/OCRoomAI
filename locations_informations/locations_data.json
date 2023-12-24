@@ -5,7 +5,7 @@
       "building picture" : "building picture",
       "floor picture" : "floor picture",
       "brief information" : [ "information about building" , 10 ],
-      "directions" : [ "step by step allocations" , 10]
+      "directions" : [ "Here are the step to find 501 room; \n\n1. Enter Red Building \n2. Go to First Floor where 501 Room located" , 9]
     },
   "avr": {
       "name" : "Audio-Visual Room",
@@ -13,15 +13,15 @@
       "building picture" : "building picture",
       "floor picture" : "floor picture",
       "brief information" : [ "information about building" , 10 ],
-      "directions" : [ "step by step allocations" , 10]
+      "directions" : [ "Here are the step to find Room Audio-Visual Room; \n\n1. Enter Red Building \n2. Go to 1st Floor where Room Audio-Visual Room located" , 9]
     },
   "502": {
       "name" : "Room 502",
       "floor" : "1st Floor",
       "building picture" : "building picture",
       "floor picture" : "floor picture",
-      "brief information" : [ "information about building" , 10 ],
-      "directions" : [ "step by step allocations" , 10]
+      "brief information" : [ "A room dedicated space within an office or organizational setting specifically designed for conducting meetings, discussions, presentations, and collaborative sessions. The purpose of a meeting room is to provide a comfortable and conducive environment for individuals or groups to gather and exchange ideas, make decisions, and address business matters. These rooms vary in size, layout, and features, but they often share common elements to support the needs of diverse " , 24 ],
+      "directions" : [ "Here are the step to find 501 Room; \n\n1.Enter Red Building \n2. Go to 2nd Floor where Room 502 located" , 9]
     },
   "office": {
       "name" : "Office of the Dean and Faculty",
@@ -29,7 +29,7 @@
       "building picture" : "building picture",
       "floor picture" : "floor picture",
       "brief information" : [ "information about building" , 10 ],
-      "directions" : [ "step by step allocations" , 10]
+      "directions" : [ "Here are the step to find Office of the Dean and Faculty of the College of Computer Science; \n\n1.Enter Red Building \n2. Go to 2nd Floor where Office of the Dean and Faculty located" , 11]
     },
   "505": {
       "name" : "Room 505",
@@ -37,7 +37,7 @@
       "building picture" : "building picture",
       "floor picture" : "floor picture",
       "brief information" : [ "information about building" , 10 ],
-      "directions" : [ "step by step allocations" , 10]
+      "directions" : [ "Here are the step to find 505 Room; \n\n1. Enter Red Building \n2. Go to 2nd Floor \n3. Go to 3rd Floor where 505 Room located" , 11]
     },
   "506": {
       "name" : "Room 506",
@@ -45,7 +45,7 @@
       "building picture" : "building picture",
       "floor picture" : "floor picture",
       "brief information" : [ "information about building" , 10 ],
-      "directions" : [ "step by step allocations" , 10]
+      "directions" : [ "Here are the step to find 506 Room; \n\n1. Enter Red Building \n2. Go to 2nd Floor \n3. Go to 3rd Floor where 506 Room located" , 11]
     },
   "507": {
       "name" : "Room 507",
@@ -53,7 +53,7 @@
       "building picture" : "building picture",
       "floor picture" : "floor picture",
       "brief information" : [ "information about building" , 10 ],
-      "directions" : [ "step by step allocations" , 10]
+      "directions" : [ "Here are the step to find 507 Room; \n\n1. Enter Red Building \n2. Go to 2nd Floor \n3. Go to 3rd Floor where 507 Room located" , 11]
     },
   "508": {
       "name" : "Room 508",
@@ -61,7 +61,7 @@
       "building picture" : "building picture",
       "floor picture" : "floor picture",
       "brief information" : [ "information about building" , 10 ],
-      "directions" : [ "step by step allocations" , 10]
+      "directions" : [ "Here are the step to find 505 Room; \n\n1. Enter Red Building \n2. Go to 2nd Floor \n3. Go to 3rd Floor \n4. Go to 4th Floor where 508 Room located" , 12]
     },
   "510": {
       "name" : "Room 510",
@@ -69,15 +69,7 @@
       "building picture" : "building picture",
       "floor picture" : "floor picture",
       "brief information" : [ "information about building" , 10 ],
-      "directions" : [ "step by step allocations" , 10]
-    },
-  "509": {
-      "name" : "Room 509",
-      "floor" : "1st Floor",
-      "building picture" : "building picture",
-      "floor picture" : "floor picture",
-      "brief information" : [ "information about building" , 10 ],
-      "directions" : [ "step by step allocations" , 10]
+      "directions" : [ "Here are the step to find 510 Room; \n\n1. Enter Red Building \n2. Go to 2nd Floor \n3. Go to 3rd Floor \n4. Go to 4th Floor where 510 Room located" , 12]
     },
   "511": {
       "name" : "Room 511",
@@ -85,23 +77,23 @@
       "building picture" : "building picture",
       "floor picture" : "floor picture",
       "brief information" : [ "information about building" , 10 ],
-      "directions" : [ "step by step allocations" , 10]
+      "directions" : [ "Here are the step to find 511 Room; \n\n1. Enter Red Building \n2. Go to 2nd Floor \n3. Go to 3rd Floor \n4. Go to 4th Floor \n5. Go to 5th Floor where 511 Room located" , 14]
     },
   "512": {
       "name" : "Room 512",
       "floor" : "1st Floor",
       "building picture" : "building picture",
       "floor picture" : "floor picture",
-      "brief information" : [ "information about building" , 10 ],
-      "directions" : [ "step by step allocations" , 10]
-    },
+      "brief information" : [ "information about building" , 14 ],
+      "directions" : [ "Here are the step to find 512 Room; \n\n1. Enter Red Building \n2. Go to 2nd Floor \n3. Go to 3rd Floor \n4. Go to 4th Floor \n5. Go to 5th Floor where 512 Room located" , 14 ]
+  },
   "513": {
       "name" : "Room 513",
       "floor" : "1st Floor",
       "building picture" : "building picture",
       "floor picture" : "floor picture",
       "brief information" : [ "information about building" , 10 ],
-      "directions" : [ "step by step allocations" , 10]
+      "directions" : [ "Here are the step to find 513 Room; \n\n1. Enter Red Building \n2. Go to 2nd Floor \n3. Go to 3rd Floor \n4. Go to 4th Floor \n5. Go to 5th Floor where 513 Room located" , 14]
     },
   "515": {
       "name" : "Room 515",
@@ -109,7 +101,7 @@
       "building picture" : "building picture",
       "floor picture" : "floor picture",
       "brief information" : [ "information about building" , 10 ],
-      "directions" : [ "step by step allocations" , 10]
+      "directions" : [ "Here are the step to find 515 Room; \n\n1. Enter Red Building \n2. Go to 2nd Floor \n3. Go to 3rd Floor \n4. Go to 4th Floor \n5. Go to 5th Floor \n6. Go to 6th where 515 Room located" , 16]
     },
   "516": {
       "name" : "Room 516",
@@ -117,22 +109,22 @@
       "building picture" : "building picture",
       "floor picture" : "floor picture",
       "brief information" : [ "information about building" , 10 ],
-      "directions" : [ "step by step allocations" , 10]
+      "directions" : [ "Here are the step to find 516 Room; \n\n1. Enter Red Building \n2. Go to 2nd Floor \n3. Go to 3rd Floor \n4. Go to 4th Floor \n5. Go to 5th Floor \n6. Go to 6th where 516 Room located" , 16]
     },
   "517": {
       "name" : "Room 517",
       "floor" : "1st Floor",
       "building picture" : "building picture",
       "floor picture" : "floor picture",
-      "brief information" : [ "information about building" , 10 ],
-      "directions" : [ "step by step allocations" , 10]
-    },
+      "brief information" : [ "information about building" , 16],
+      "directions" : [ "Here are the step to find 517 Room; \n\n1. Enter Red Building \n2. Go to 2nd Floor \n3. Go to 3rd Floor \n4. Go to 4th Floor \n5. Go to 5th Floor \n6. Go to 6th where 517 Room located" , 16]
+  },
   "radio": {
       "name" : "Radio Natin Station",
       "floor" : "1st Floor",
       "building picture" : "building picture",
       "floor picture" : "floor picture",
       "brief information" : [ "information about building" , 10 ],
-      "directions" : [ "step by step allocations" , 10]
+      "directions" : [ "Here are the step to find Radio Natin Station; \n\n1. Enter Red Building \n2. Go to 2nd Floor \n3. Go to 3rd Floor \n4. Go to 4th Floor \n5. Go to 5th Floor \n6. Go to 6th where Radio Natin Station located" , 16]
     }
 }
