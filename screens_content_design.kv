@@ -124,7 +124,181 @@
 
 
 
+# ------------------------ Faculty Screens ----------------------
+
+<TeachersScreen>:
+
+    FloatLayout:
+        size_hint : 1, 1
+        canvas.before:
+            Color:
+                rgba : chex("eff3f4")
+            RoundedRectangle:
+                pos : self.pos
+                size : self.size
+                radius : ( min(self.size) * 0.08, )
+
+        # Teacher Image
+        Image:
+            size_hint : 0.3 , 0.37
+            pos_hint : { "top" : 0.93 , "x" : 0.05 }
+
+        # Teacher Name
+        Label:
+            size_hint : 0.5 , 0.1
+            pos_hint : { "top" : 0.92 , "x" : 0.38 }
+            text : "Violeta B. Montecalvo"
+            font_name : "title_font"
+            text_size: self.width - dp(20), None
+            height : self.texture_size[1]
+            font_size : min(self.parent.size) * 0.04
+
+            canvas.before:
+                Color:
+                    rgba : chex("7f0f0f")
+                RoundedRectangle:
+                    pos : self.pos
+                    size : self.size
+                    radius : ( min(self.size) * 0.08, )
+
+        #Teacher Information
+        ScrollView:
+            size_hint : 0.5 , 0.23
+            pos_hint : { "top" : 0.8 , "x" : 0.38 }
+
+            canvas.before:
+                Color:
+                    rgba : chex("7f0f0f")
+                RoundedRectangle:
+                    pos : self.pos
+                    size : self.size
+                    radius : ( min(self.size) * 0.08, )
+
+            MDGridLayout:
+                adaptive_height: True
+                cols : 1
+                padding : dp(5)
+                Label:
+                    size_hint : 1, None
+                    text : "Violeta B. Montecalvo"
+                    font_name : "content_font"
+                    text_size: self.width - dp(20), None
+                    height : self.texture_size[1]
+                    font_size : min(self.parent.parent.size) * 0.13
+
+        #Teacher Information
+        BoxLayout:
+
+
+
+<ClickedNavButtonTest@Button>:
+    font_size : min(self.size) * 0.4
+    font_name : "content_font"
+    background_down : ""
+    background_color : 0, 0 , 0, 0
+    size_hint : 1 , None
+    height : min(self.parent.parent.size) * 0.2 if self.parent else dp(100)
+
+    canvas.before:
+        Color:
+            rgba : chex("ddacae")
+        RoundedRectangle:
+            pos : self.pos
+            size : self.size
+            radius : ( min(self.size) * 0.1, )
+
+
+<NavigationButton>:
+    font_size : min(self.size) * 0.4
+    font_name : "content_font"
+    background_down : ""
+    background_color : 0, 0 , 0, 0
+    size_hint : 1 , None
+    height : min(self.parent.parent.size) * 0.2 if self.parent else dp(100)
+
+    canvas.before:
+        Color:
+            rgba : chex("620609")
+        RoundedRectangle:
+            pos : self.pos
+            size : self.size
+            radius : ( min(self.size) * 0.1, )
+
+    on_release:
+        self.command()
+
 <FacultyScreen>:
+
+    BoxLayout:
+        canvas.before:
+            Color:
+                rgba : chex('#620609')
+            RoundedRectangle:
+                pos: self.pos
+                size : self.size
+                radius : ( min(self.size) * 0.030 ,)
+        padding: dp(25)
+        spacing : dp(15)
+
+        # Faculty Navigator ==========================================>
+        BoxLayout:
+            size_hint: 0.35 , 1
+            orientation : 'vertical'
+            canvas.before:
+                Color:
+                    rgba : chex('eff3f4')
+                RoundedRectangle:
+                    pos : self.pos
+                    size : self.size
+                    radius : ( min(self.size) * 0.09, )
+
+            Label:
+                text: "TEACHERS"
+                font_name : "title_font"
+                color : "black"
+                font_size : min(self.size) * 0.5
+                size_hint: 1 , 0.08
+                canvas.before:
+                    Color:
+                        rgba : chex('68848f')
+                    RoundedRectangle:
+                        pos : self.pos
+                        size : self.size
+                        radius : ( min(self.size) * 0.5, )
+
+            ScrollView:
+                size_hint : 1 , 0.92
+
+                MDGridLayout:
+                    adaptive_height: True
+                    spacing : dp(5)
+                    cols : 1
+                    padding : dp(5)
+
+                    NavigationButton:
+                        text : "Justine S. Aban"
+
+                    ClickedNavButtonTest:
+                        text : "Violeta B. Montecalvo"
+                        color : "black"
+
+                    NavigationButton:
+                        text : "Jovelyn B. Patalinghug"
+
+                    NavigationButton:
+                        text : "Laila L. Dieto"
+
+
+
+
+        # Faculty Screens
+        ScreenManager:
+
+            TeachersScreen:
+                name : "test"
+
+
+
 
 
 <DeveloperScreen>:

@@ -1,0 +1,5 @@
+[/] Update the Teacher Screen when the entering the main screen
+    - Update the image, location name and directions
+    - Automatic point to office when the teacher time is not specified
+[*] Clean the locations data
+    - Clean the directions data

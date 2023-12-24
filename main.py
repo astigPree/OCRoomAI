@@ -12,7 +12,7 @@ from kivy.core.text import LabelBase
 from kivy.clock import Clock
 
 from threading import Thread
-import os, pickle, json
+import os, pickle, json , typing
 
 from content_screens import GuestScreen, FacultyScreen, DeveloperScreen
 
@@ -31,14 +31,12 @@ class MainWindow(FloatLayout) :
     content: ContentWindow = ObjectProperty(None)
     activity : Label = ObjectProperty(None)
 
-
     size_effect = NumericProperty(5.0)
     stop_all_running = BooleanProperty(False)
     __ai_talking: str = StringProperty("This is a test of the UI Display asjdf sdfjo jsdf jsdafj sadjo joojds oj dsf")
 
     __instructor_data : dict = ObjectProperty(None)
     __room_data : dict = ObjectProperty(None)
-
 
     from backend.algo_recognation import recognizeAlgo
 
@@ -67,6 +65,12 @@ class MainWindow(FloatLayout) :
     def getRoomData(self) -> dict :
         return self.__room_data
 
+    def getSpecificRoom(self, key : str) -> typing.Union[dict , None]:
+        for room in self.__room_data:
+            if room == key:
+                return self.__room_data[key]
+        return None
+
     def animateDisplayTalking(self, talking_time: int) :
         def Animate(speed: float) :
             if not len(self.__ai_talking) :
@@ -85,7 +89,6 @@ class MainWindow(FloatLayout) :
         self.display_talking.text = ""
         self.__ai_talking = text
         Clock.schedule_once(lambda x : self.animateDisplayTalking(talking_speed))
-
 
 
 class RoomAIApp(MDApp) :
