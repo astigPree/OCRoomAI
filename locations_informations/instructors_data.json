@@ -1,7 +1,7 @@
 {
   "justine" : {
       "person" :  "Justin Aban",
-      "picture" : "picture path",
+      "picture" : "C:\\Users\\63948\\Desktop\\PyProg\\OC Room AI UI\\pictures\\my_picture.jpg",
       "information" : "    Teacher who is also a software engineer is an individual with a unique combination of skills and expertise. This person typically possesses a background in software engineering, which includes knowledge of programming languages, software development methodologies, and a deep understanding of computer science principles.",
       "locations": {
         "avr" : ["13:00:00-15:30:00"]
