@@ -2,4 +2,14 @@
     - Update the image, location name and directions
     - Automatic point to office when the teacher time is not specified
 [*] Clean the locations data
-    - Clean the directions data
+    - Clean the direction's data
+    * Clean the information data
+[/] Design Faculty Screen
+    - Design Navigator
+    - Design Picture Holder
+    - Design Information Holder
+    - Design Name Holder
+    - Design Schedule Holder
+    - Design Activity List Holder
+[*] Design Guest Screen
+    * Resize the size of text based on how long it is

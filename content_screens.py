@@ -8,12 +8,18 @@ from kivy.animation import Animation
 from kivy.clock import Clock
 from kivy.utils import get_color_from_hex as chex
 
+Clock.max_iteration = 60
+
 from kivy.properties import ObjectProperty, ListProperty, BooleanProperty, StringProperty
 
 from datetime import datetime
 
 
 # ------------------------ Faculty Screens ----------------------
+class ScheduleContainer(BoxLayout):
+    pass
+
+
 class TeachersScreen(Screen) :
     pass
 

@@ -5,11 +5,11 @@
     orientation : 'vertical'
     locationName : locationName
     locationImage : locationImage
-    spacing : min(self.size) * 0.05
+    spacing : min(self.size) * 0.03
 
     BoxLayout :
-        size_hint : 1 , 0.9
-        padding : dp(20)
+        size_hint : 1 , 0.8
+        padding : [ dp(20) , dp(10) , dp(20) , dp(10) ]
         canvas.before:
             Color:
                 rgba : chex('f0f3f4')
@@ -26,17 +26,16 @@
 
     Label:
         id : locationName
-        size_hint : 1 , 0.1
+        size_hint : 1 , 0.2
         text : "ROOM 501"
         font_name : 'title_font'
         font_size : min(root.size) * 0.1
-
-
+        color : chex('f0f3f4')
 
 
 <LocationInformationContainer>:
     orientation: 'vertical'
-    padding : [ dp(5) , dp(0) , dp(5) , dp(0) ]
+    spacing : dp(5)
 
     title : title
     info : info
@@ -56,20 +55,32 @@
 		font_size : min(root.size) * 0.1
         text : "DIRECTIONS"
         font_name : "title_font"
-        color : "black"
+        color : chex("620609")
 
-    Label:
-        id : info
-        size_hint : 1 , None
-        text : "[font=title_font]1.[/font] hsdfdsdsfdssdfsd  sdafd jfjs dfd sasdjkjk fd \n[font=title_font]2.[/font] hdshdshfdsfd hdsa \n[font=title_font]3.[/font] jdsfhdshsdhld"
-        font_name : "content_font"
-        height: self.texture_size[1]
-		text_size: self.width, None
-        color : "black"
-        markup : True
-        font_size : min(root.size) * 0.07
+        canvas.before:
+            Color:
+                rgba : chex("dabbbb")
+            RoundedRectangle:
+                pos : self.pos
+                size : self.size
+                radius : ( min(self.parent.size) * 0.05, )
 
-    Widget:
+    ScrollView:
+        MDGridLayout:
+            adaptive_height : True
+            cols : 1
+            padding : [ dp(5) , dp(0) , dp(5) , dp(0) ]
+
+            Label:
+                id : info
+                size_hint : 1 , None
+                font_name : "content_font"
+                height: self.texture_size[1]
+                text_size: self.width, None
+                color : chex("620609")
+                markup : True
+                font_size : min(root.size) * 0.07
+
 
 
 <LocationScreenInformation>:
@@ -91,8 +102,8 @@
 
         BoxLayout:
             orientation : 'vertical'
-            pos_hint : { "x" : 0.05 , "center_y" : 0.5 }
-            size_hint : 0.55 , 0.9
+            pos_hint : { "x" : 0.08 , "center_y" : 0.5 }
+            size_hint : 0.5 , 0.92
             spacing : min(self.size) * 0.04
 
             LocationImageContainer:
@@ -125,6 +136,59 @@
 
 
 # ------------------------ Faculty Screens ----------------------
+<ScheduleContainer>:
+    size_hint : 1, None
+    height : self.width * 0.07
+    canvas.before:
+        Color:
+            rgba : chex("f0f3f4")
+        RoundedRectangle:
+            pos: self.pos
+            size : self.size
+            radius : ( min(self.size) * 0.01, )
+
+    Label:
+        size_hint : None , 1
+        width : root.size[0] / len(root.children)
+        text : "AVR"
+        font_name : "content_font"
+        font_size : min(self.size) * 0.5
+        color : chex("620609")
+
+    Label:
+        size_hint : None , 1
+        width : root.size[0] / len(root.children)
+        text : "12:00 - 13:00"
+        font_name : "content_font"
+        font_size : min(self.size) * 0.5
+        color : chex("620609")
+
+    BoxLayout:
+        size_hint : None , 1
+        width : root.size[0] / len(root.children)
+        spacing : min(self.size) * 0.2
+        padding : min(self.size) * 0.1
+
+        Widget:
+
+        MDIconButton:
+            icon : "update"
+            font_size : min(self.parent.size) * 0.5
+            size_hint : 0.3 , 1
+            theme_icon_color: "Custom"
+            icon_color: chex('0da42e')
+
+        Widget:
+
+        MDIconButton:
+            icon : "delete-forever"
+            font_size : min(self.parent.size) * 0.5
+            size_hint : 0.3 , 1
+            theme_icon_color: "Custom"
+            icon_color: chex('bf090f')
+
+        Widget:
+
 
 <TeachersScreen>:
 
@@ -142,12 +206,13 @@
         Image:
             size_hint : 0.3 , 0.37
             pos_hint : { "top" : 0.93 , "x" : 0.05 }
+            source : "pictures/my_picture.jpg"
 
         # Teacher Name
         Label:
             size_hint : 0.5 , 0.1
             pos_hint : { "top" : 0.92 , "x" : 0.38 }
-            text : "Violeta B. Montecalvo"
+            text : "Ericson Mark A. Guanzon"
             font_name : "title_font"
             text_size: self.width - dp(20), None
             height : self.texture_size[1]
@@ -178,34 +243,87 @@
                 adaptive_height: True
                 cols : 1
                 padding : dp(5)
-                Label:
-                    size_hint : 1, None
-                    text : "Violeta B. Montecalvo"
-                    font_name : "content_font"
-                    text_size: self.width - dp(20), None
-                    height : self.texture_size[1]
-                    font_size : min(self.parent.parent.size) * 0.13
 
-        #Teacher Information
+                FacultyScreenLabelForInformation:
+
+
+        #Teacher Schedule Time
         BoxLayout:
+            orientation : 'vertical'
+            size_hint : 0.63 , 0.47
+            pos_hint: { 'x' : 0.05 , 'y' : 0.05 }
+            canvas.before:
+                Color:
+                    rgba : chex("7f0f0f")
+                Rectangle:
+                    pos : self.pos
+                    size : self.size
 
+            FacultyScreenHeadingHolderBoxLayout:
+                size_hint : 1,  0.15
 
+            ScrollView:
+                size_hint : 1,  0.85
 
-<ClickedNavButtonTest@Button>:
-    font_size : min(self.size) * 0.4
-    font_name : "content_font"
-    background_down : ""
-    background_color : 0, 0 , 0, 0
-    size_hint : 1 , None
-    height : min(self.parent.parent.size) * 0.2 if self.parent else dp(100)
+                MDGridLayout:
+                    adaptive_height : True
+                    cols : 1
+                    spacing : min(self.parent.size) * 0.02
+                    padding : min(self.size) * 0.1
 
-    canvas.before:
-        Color:
-            rgba : chex("ddacae")
-        RoundedRectangle:
-            pos : self.pos
-            size : self.size
-            radius : ( min(self.size) * 0.1, )
+                    ScheduleContainer:
+
+                    ScheduleContainer:
+
+                    ScheduleContainer:
+
+                    ScheduleContainer:
+
+        # Teacher Activity
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint : 0.25 , 0.42
+            pos_hint: { 'right' : 0.97 , 'y' : 0.08 }
+            canvas.before:
+                Color:
+                    rgba : chex("7f0f0f")
+                RoundedRectangle:
+                    pos : self.pos
+                    size : self.size
+                    radius : ( min(self.size) * 0.05, )
+
+            Label:
+                size_hint : 1 , 0.25
+                text : "ACTIVITY"
+                color : chex("7f0f0f")
+                font_size : min(self.size) * 0.5
+                font_name : "title_font"
+                canvas.before:
+                    Color:
+                        rgba : chex("dabbbb")
+                    RoundedRectangle:
+                        pos : self.pos
+                        size : self.size
+                        radius : ( min(self.parent.size) * 0.05, )
+
+            BoxLayout:
+                orientation : 'vertical'
+                size_hint: 1 , 0.75
+                padding :  min(self.size) * 0.1
+                spacing : min(self.size) * 0.03
+
+                FacultyScreenActivityButton:
+                    text : "Change Info"
+                    color : chex("620609")
+                FacultyScreenActivityButton:
+                    text : "Add Schedule"
+                    color : chex("620609")
+                FacultyScreenActivityButton:
+                    text : "Apply Change"
+                    color : chex('0da42e')
+                FacultyScreenActivityButton:
+                    text : "Reset Schedule"
+                    color : chex('bf090f')
 
 
 <NavigationButton>:
@@ -214,7 +332,7 @@
     background_down : ""
     background_color : 0, 0 , 0, 0
     size_hint : 1 , None
-    height : min(self.parent.parent.size) * 0.2 if self.parent else dp(100)
+    height : min(self.parent.parent.size) * 0.15 if self.parent else dp(100)
 
     canvas.before:
         Color:
@@ -222,7 +340,7 @@
         RoundedRectangle:
             pos : self.pos
             size : self.size
-            radius : ( min(self.size) * 0.1, )
+            radius : ( min(self.size) * 0.6, )
 
     on_release:
         self.command()
@@ -252,43 +370,39 @@
                     size : self.size
                     radius : ( min(self.size) * 0.09, )
 
-            Label:
-                text: "TEACHERS"
-                font_name : "title_font"
-                color : "black"
-                font_size : min(self.size) * 0.5
-                size_hint: 1 , 0.08
-                canvas.before:
-                    Color:
-                        rgba : chex('68848f')
-                    RoundedRectangle:
-                        pos : self.pos
-                        size : self.size
-                        radius : ( min(self.size) * 0.5, )
+            FacultyScreenTitleNav:
+                size_hint: 1 , 0.1
 
             ScrollView:
-                size_hint : 1 , 0.92
+                size_hint : 1 , 0.8
 
                 MDGridLayout:
                     adaptive_height: True
                     spacing : dp(5)
                     cols : 1
-                    padding : dp(5)
+                    padding : [ dp(5) , dp(20) , dp(5), dp(0) ]
 
                     NavigationButton:
                         text : "Justine S. Aban"
 
-                    ClickedNavButtonTest:
-                        text : "Violeta B. Montecalvo"
-                        color : "black"
+                    NavigationButton:
+                        text : "Ericson Mark A. Guanzon"
+                        font_name : "title_font"
+                        color : chex("620609")
+
+                        canvas.before:
+                            Color:
+                                rgba : chex("ddacae")
+                            RoundedRectangle:
+                                pos : self.pos
+                                size : self.size
+                                radius : ( min(self.size) * 0.6, )
 
                     NavigationButton:
                         text : "Jovelyn B. Patalinghug"
 
                     NavigationButton:
                         text : "Laila L. Dieto"
-
-
 
 
         # Faculty Screens
@@ -304,3 +418,75 @@
 <DeveloperScreen>:
 
 
+
+# ======================= ADDITIONAL DESIGN =================================
+
+#                     ------------------ FACULTY SCREEN --------------
+<FacultyScreenActivityButton@Button>:
+    background_color : 0 , 0, 0, 0
+    background_down : ""
+    font_name : "title_font"
+    font_size : min(self.size) * 0.5
+
+    canvas.before:
+        Color :
+            rgba : chex('ffffff')
+        RoundedRectangle:
+            pos : self.pos
+            size : self.size
+            radius : ( min( self.size) * 0.5 ,)
+
+
+<FacultyScreenHeadingHolderBoxLayout@BoxLayout>:
+    canvas.before:
+        Color:
+            rgba : chex("dabbbb")
+        Rectangle:
+            pos: self.pos
+            size : self.size
+
+    Label:
+        size_hint : None , 1
+        width : root.size[0] / len(root.children)
+        text : "LOCATION"
+        font_name : "title_font"
+        font_size : min(self.size) * 0.5
+        color : chex("620609")
+    Label:
+        size_hint : None , 1
+        width : root.size[0] / len(root.children)
+        text : "TIME - TIME"
+        font_name : "title_font"
+        font_size : min(self.size) * 0.5
+        color : chex("620609")
+    Label:
+        size_hint : None , 1
+        width : root.size[0] / len(root.children)
+        text : "ACTIONS"
+        font_name : "title_font"
+        font_size : min(self.size) * 0.5
+        color : chex("620609")
+
+
+
+<FacultyScreenLabelForInformation@Label>:
+    size_hint : 1, None
+    text : "Ericson Mark A. Guanzon"
+    font_name : "content_font"
+    text_size: self.width - dp(20), None
+    height : self.texture_size[1]
+    font_size : min(self.parent.parent.size) * 0.13
+
+
+<FacultyScreenTitleNav@Label>:
+    text: "TEACHERS"
+    font_name : "title_font"
+    color : chex("620609")
+    font_size : min(self.size) * 0.5
+    canvas.before:
+        Color:
+            rgba : chex('DABBBB')
+        RoundedRectangle:
+            pos : self.pos
+            size : self.size
+            radius : ( min(self.size) * 0.4, )
