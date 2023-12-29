@@ -135,7 +135,188 @@
 
 
 
-# ------------------------ Faculty Screens ----------------------
+# ------------------------ Faculty Screens ---------------------
+<AddFacultyScheduleModalView>:
+    background_color : 0 , 0 , 0, 0
+    overlay_color : 0, 0, 0, 0
+
+    location_dropdown : location_dropdown
+
+    canvas.before:
+        Color:
+            rgb : chex('7f0f0f')
+            a : 0.8
+        Rectangle:
+            pos : self.pos
+            size : self.size
+
+    BoxLayout:
+        size_hint : 0.5, 0.6
+        pos_hint : { 'center_x' : 0.5 , 'center_y' : 0.5 }
+        orientation : 'vertical'
+        padding : min(self.size) * 0.05
+        spacing : min(self.size) * 0.01
+
+        canvas.before:
+            Color :
+                rgba : chex('f0f3f4')
+            RoundedRectangle:
+                pos : self.pos
+                size : self.size
+                radius : ( min(self.size) * 0.1, )
+
+        BoxLayout:
+            size_hint : 1 , 0.15
+            padding : ( min(self.size) * 0.3 , 0 , min(self.size) * 0.3 , 0 )
+
+            Label:
+                text : "L O C A T I O N :"
+                font_name : "title_font"
+                font_size : min(self.size) * 0.4
+                size_hint : 0.4 ,1
+                color : "black"
+
+
+            Button :
+                id : location_dropdown
+                size_hint : 0.6 , 1
+                background_color : 0 , 0 , 0 , 0
+
+                canvas.before:
+                    Color:
+                        rgba: chex('7f0f0f')
+                    RoundedRectangle:
+                        pos : self.pos
+                        size : self.size
+                        radius : ( min(self.size) * 0.1, )
+
+        BoxLayout:
+            size_hint : 1 , 0.6
+            orientation : 'vertical'
+
+            BoxLayout:
+                size_hint : 1 , 0.3
+
+                AddFacultyScheduleModalViewLabel:
+                    text : "START TIME"
+
+                AddFacultyScheduleModalViewLabel:
+                    text : "END TIME"
+
+
+            BoxLayout:
+                size_hint : 1 , 0.7
+
+                ChangeFacultyInfoModalViewButtonCancel:
+
+                ChangeFacultyInfoModalViewButtonCancel:
+
+        Widget:
+            size_hint : 1 , 0.2
+
+<ChangeFacultyInfoModalView>:
+    background_color : 0 , 0 , 0, 0
+    overlay_color : 0, 0, 0, 0
+
+    canvas.before:
+        Color:
+            rgb : chex('7f0f0f')
+            a : 0.8
+        Rectangle:
+            pos : self.pos
+            size : self.size
+
+    BoxLayout:
+        size_hint : 0.5, 0.6
+        pos_hint : { 'center_x' : 0.5 , 'center_y' : 0.5 }
+        orientation : 'vertical'
+        padding : min(self.size) * 0.05
+        spacing : min(self.size) * 0.01
+
+        canvas.before:
+            Color :
+                rgba : chex('f0f3f4')
+            RoundedRectangle:
+                pos : self.pos
+                size : self.size
+                radius : ( min(self.size) * 0.1, )
+
+        BoxLayout:
+            size_hint : 1 , 0.2
+
+            Label:
+                text : "N A M E :"
+                font_name : "title_font"
+                font_size : min(self.size) * 0.4
+                size_hint : 0.3 ,1
+                color : "black"
+
+            BoxLayout :
+                size_hint : 0.7 , 1
+                padding : min(self.size) * 0.1
+                canvas.before:
+                    Color:
+                        rgba: chex('7f0f0f')
+                    RoundedRectangle:
+                        pos : self.pos
+                        size : self.size
+                        radius : ( min(self.size) * 0.1, )
+
+                TextInput :
+                    size_hint : 1 , 1
+                    background_color : 0, 0 , 0 , 0
+                    cursor_color : chex('f0f3f4')
+                    foreground_color : chex('f0f3f4')
+                    multiline : False
+                    font_name : "content_font"
+                    font_size : min(self.size) * 0.52
+                    valign : "center"
+
+
+        BoxLayout:
+            size_hint : 1 , 0.6
+            orientation : 'vertical'
+
+            Label:
+                text : "I N F O R M A T I O N : "
+                font_name : "title_font"
+                font_size : min(self.size) * 0.4
+                size_hint : 1 , 0.3
+                color : "black"
+                text_size: self.width, None
+
+            BoxLayout :
+                size_hint : 1 , 0.7
+                padding : min(self.size) * 0.1
+                canvas.before:
+                    Color:
+                        rgba: chex('7f0f0f')
+                    RoundedRectangle:
+                        pos : self.pos
+                        size : self.size
+                        radius : ( min(self.size) * 0.1, )
+
+                TextInput :
+                    size_hint : 1 , 1
+                    background_color : 0, 0 , 0 , 0
+                    cursor_color : chex('f0f3f4')
+                    foreground_color : chex('f0f3f4')
+                    multiline : True
+                    font_name : "content_font"
+                    font_size : min(self.size) * 0.15
+                    valign : "center"
+
+
+        BoxLayout:
+            size_hint : 1 , 0.2
+            padding : min(self.size) * 0.2
+            spacing : min(self.size) * 0.3
+
+            ChangeFacultyInfoModalViewButtonUpdate:
+
+            ChangeFacultyInfoModalViewButtonCancel:
+
+
 <ScheduleContainer>:
     size_hint : 1, None
     height : self.width * 0.07
@@ -422,6 +603,56 @@
 # ======================= ADDITIONAL DESIGN =================================
 
 #                     ------------------ FACULTY SCREEN --------------
+<ChangeFacultyInfoModalViewButtonCancel@Button>:
+    background_color : 0 , 0, 0, 0
+    background_down : ""
+    font_name : "content_font"
+    font_size : min(self.size) * 0.5
+    text : "12:00"
+
+    canvas.before:
+        Color :
+            rgba : chex('7f0f0f')
+        RoundedRectangle:
+            pos : self.pos
+            size : self.size
+            radius : ( min( self.size) * 0.5 ,)
+
+<AddFacultyScheduleModalViewLabel@Label>:
+    font_size: min(self.size) * 0.3
+    font_name : "title_font"
+    color : "black"
+
+<ChangeFacultyInfoModalViewButtonCancel@Button>:
+    background_color : 0 , 0, 0, 0
+    background_down : ""
+    font_name : "title_font"
+    font_size : min(self.size) * 0.5
+    text : "CANCEL"
+
+    canvas.before:
+        Color :
+            rgba : chex('bf090f')
+        RoundedRectangle:
+            pos : self.pos
+            size : self.size
+            radius : ( min( self.size) * 0.5 ,)
+
+<ChangeFacultyInfoModalViewButtonUpdate@Button>:
+    background_color : 0 , 0, 0, 0
+    background_down : ""
+    font_name : "title_font"
+    font_size : min(self.size) * 0.5
+    text : "UPDATE"
+
+    canvas.before:
+        Color :
+            rgba : chex('0da42e')
+        RoundedRectangle:
+            pos : self.pos
+            size : self.size
+            radius : ( min( self.size) * 0.5 ,)
+
 <FacultyScreenActivityButton@Button>:
     background_color : 0 , 0, 0, 0
     background_down : ""

@@ -11,5 +11,7 @@
     - Design Name Holder
     - Design Schedule Holder
     - Design Activity List Holder
+    - Design Change Info ModalView
+    * Desing Add Schedule ModalView
 [*] Design Guest Screen
     * Resize the size of text based on how long it is

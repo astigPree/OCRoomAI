@@ -21,8 +21,8 @@ class ContentWindow(ScreenManager) :
     listOfScreen = ('guest', 'faculty', 'developer')
 
     def on_kv_post(self, base_widget) :
-        self.add_widget(GuestScreen(name=self.listOfScreen[0]))
         self.add_widget(FacultyScreen(name=self.listOfScreen[1]))
+        self.add_widget(GuestScreen(name=self.listOfScreen[0]))
         self.add_widget(DeveloperScreen(name=self.listOfScreen[2]))
 
 

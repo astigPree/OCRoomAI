@@ -3,12 +3,14 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.image import Image
 from kivy.uix.button import Button
+from kivy.uix.modalview import ModalView
+from kivy.uix.dropdown import DropDown
 
 from kivy.animation import Animation
 from kivy.clock import Clock
 from kivy.utils import get_color_from_hex as chex
 
-Clock.max_iteration = 60
+Clock.max_iteration = 30
 
 from kivy.properties import ObjectProperty, ListProperty, BooleanProperty, StringProperty
 
@@ -16,6 +18,31 @@ from datetime import datetime
 
 
 # ------------------------ Faculty Screens ----------------------
+class AddFacultyScheduleModalViewTimeSelections(BoxLayout):
+    pass
+
+
+class AddFacultyScheduleModalView(ModalView):
+    location_dropdown : Button = ObjectProperty()
+    dropdown_list = DropDown()
+
+    def on_kv_post(self, base_widget):
+        for index in range(10) :
+
+            btn = Button(text='Value %d' % index, size_hint_y=None, height=44)
+            btn.bind(on_release=lambda btn : self.dropdown_list.select(self.location_dropdown.text))
+
+            # then add the button inside the dropdown
+            self.dropdown_list.add_widget(btn)
+
+        self.location_dropdown.bind(on_release=self.dropdown_list.open)
+        self.dropdown_list.bind(on_select=lambda instance, x : setattr(self.location_dropdown, 'text', x))
+
+
+class ChangeFacultyInfoModalView(ModalView):
+    pass
+
+
 class ScheduleContainer(BoxLayout):
     pass
 
@@ -34,7 +61,11 @@ class NavigationButton(Button) :
 
 
 class FacultyScreen(Screen) :
-    pass
+
+    def on_kv_post(self, base_widget):
+        self.view = AddFacultyScheduleModalView()
+
+        Clock.schedule_once(lambda x : self.view.open() , 1)
 
 
 # ------------------------ Guest Screens ----------------------
