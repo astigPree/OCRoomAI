@@ -10,7 +10,7 @@ from kivy.animation import Animation
 from kivy.clock import Clock
 from kivy.utils import get_color_from_hex as chex
 
-Clock.max_iteration = 30
+Clock.max_iteration = 60
 
 from kivy.properties import ObjectProperty, ListProperty, BooleanProperty, StringProperty
 
@@ -61,11 +61,12 @@ class NavigationButton(Button) :
 
 
 class FacultyScreen(Screen) :
-
-    def on_kv_post(self, base_widget):
-        self.view = AddFacultyScheduleModalView()
-
-        Clock.schedule_once(lambda x : self.view.open() , 1)
+    pass
+    #
+    # def on_kv_post(self, base_widget):
+    #     self.view = AddFacultyScheduleModalView()
+    #
+    #     Clock.schedule_once(lambda x : self.view.open() , 1)
 
 
 # ------------------------ Guest Screens ----------------------
@@ -167,6 +168,15 @@ class GuestScreen(Screen) :
 
     def on_kv_post(self, base_widget) :
         pass
+
+    def changeScreen(self, name : str):
+        if name not in self.screens_names:
+            raise Exception(f"Can't change screen, {name} screen does not exist")
+        self.__okey_to_animate = False
+        self.screens_handler.current = name
+
+    def okeyToChangeScreen(self):
+        self.__okey_to_animate = True
 
     def on_enter(self, *args) :
         if self.parent :

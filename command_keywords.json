@@ -1,0 +1,51 @@
+{
+    "change": [
+        "switch screen",
+        "replac the screen",
+        "chang the screen",
+        "swap the screen",
+        "altern screen",
+        "palit screen"
+    ],
+    "unactivated": [
+        "ceas talk",
+        "stop talk",
+        "hush up",
+        "be quiet",
+        "shut up",
+        "keep silent",
+        "quiet down",
+        "stop chatter",
+        "zip it",
+        "pumuyo ka",
+        "umukoy ka",
+        "udong na",
+        "pahuway ka"
+    ],
+    "activated" : [
+        "begin speak",
+        "commenc talk",
+        "start convers",
+        "open up",
+        "initi a convers",
+        "break the silenc",
+        "kick off a discuss",
+        "resum speak",
+        "mag-istorya ka",
+        "start talk"
+    ],
+    "shutdown": [
+        "kindli shut down",
+        "pleas turn off",
+        "close",
+        "ceas oper",
+        "shutdown",
+        "exit applic",
+        "termin",
+        "pakisara",
+        "sumara ka",
+        "start close",
+        "pumatay ka"
+    ]
+
+}

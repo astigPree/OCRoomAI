@@ -15,3 +15,5 @@
     * Desing Add Schedule ModalView
 [*] Design Guest Screen
     * Resize the size of text based on how long it is
+[*] Create Backend
+    * handle main command

@@ -1,5 +1,5 @@
-from kivy.config import Config
-Config.set('graphics', 'fullscreen', 'auto')
+# from kivy.config import Config
+# Config.set('graphics', 'fullscreen', 'auto')
 
 from kivymd.app import MDApp
 from kivy.uix.floatlayout import FloatLayout
@@ -21,8 +21,8 @@ class ContentWindow(ScreenManager) :
     listOfScreen = ('guest', 'faculty', 'developer')
 
     def on_kv_post(self, base_widget) :
-        self.add_widget(FacultyScreen(name=self.listOfScreen[1]))
         self.add_widget(GuestScreen(name=self.listOfScreen[0]))
+        self.add_widget(FacultyScreen(name=self.listOfScreen[1]))
         self.add_widget(DeveloperScreen(name=self.listOfScreen[2]))
 
 
@@ -35,8 +35,11 @@ class MainWindow(FloatLayout) :
     stop_all_running = BooleanProperty(False)
     __ai_talking: str = StringProperty("This is a test of the UI Display asjdf sdfjo jsdf jsdafj sadjo joojds oj dsf")
 
+    location_selected : str = StringProperty("") # Used to be connection to algo_recognation when changing screen
+
     __instructor_data : dict = ObjectProperty(None)
     __room_data : dict = ObjectProperty(None)
+    __commands_pattern : dict = ObjectProperty(None)
 
     from backend.algo_recognation import recognizeAlgo
 
@@ -51,10 +54,18 @@ class MainWindow(FloatLayout) :
         # TODO: Load the teachers and rooms data
         self.__instructor_data = self.loadNeededData(filename="instructors_data.json", folder="locations_informations")
         self.__room_data = self.loadNeededData(filename="locations_data.json", folder="locations_informations")
+        self.__commands_pattern = self.loadNeededData(filename="command_keywords.json")
 
     def on_kv_post(self, base_widget):
         self.ids['picture'].ids['picture'].source = os.path.join(os.path.dirname(__file__), 'pictures', 'building.jpg')
         Thread(target=self.recognizeAlgo).start()
+        Clock.schedule_interval(self.update_activity , 1 / 30)
+
+    def update_activity(self, interval : float):
+        if self.location_selected:
+            guest_screen : GuestScreen = self.content.current_screen
+            guest_screen.changeScreen(self.location_selected)
+            self.location_selected = ""
 
     def close(self):
         self.stop_all_running = True
@@ -64,6 +75,9 @@ class MainWindow(FloatLayout) :
 
     def getRoomData(self) -> dict :
         return self.__room_data
+
+    def getCommandPattern(self) -> dict:
+        return self.__commands_pattern
 
     def getSpecificRoom(self, key : str) -> typing.Union[dict , None]:
         for room in self.__room_data:
