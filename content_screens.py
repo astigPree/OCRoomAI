@@ -113,6 +113,13 @@ class LocationScreenInformation(Screen) :
     def on_leave(self, *args) :
         self.leave_animate.start(self)
 
+    def getScreenInformation(self) -> dict:
+        # Data Structure = { directions : ( text , int ) }
+        if self.isRoom:
+            return { "directions" : self.__data["directions"] }
+        else :
+            return {"directions" : [ "I can't find the location of the instructor" , 1]}
+
     def updateOnlyTeacherScreen(self) :
         # TODO: Update the screen if it TEACHER Screen
         current_time = datetime.now()
@@ -167,7 +174,13 @@ class GuestScreen(Screen) :
     __changing_speed = 5
 
     def on_kv_post(self, base_widget) :
-        pass
+        Clock.schedule_interval(self.update_activity , 1 / 30)
+
+    def update_activity(self, interval : float):
+        if self.parent:
+            if self.parent.parent.location_selected:
+                self.changeScreen(self.parent.parent.location_selected)
+                self.parent.parent.location_selected = ""
 
     def changeScreen(self, name : str):
         if name not in self.screens_names:

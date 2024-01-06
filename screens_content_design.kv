@@ -1,4 +1,5 @@
 
+#:import screenTransition kivy.uix.screenmanager.WipeTransition
 
 # ------------------------ Guest Screens ----------------------
 <LocationImageContainer>:
@@ -131,6 +132,7 @@
     screens_handler : screens_handler
 
     ScreenManager:
+        transition : screenTransition(clearcolor=[1 , 1 , 1 , 0 ])
         id : screens_handler
 
 
@@ -351,6 +353,7 @@
         padding : min(self.size) * 0.1
 
         Widget:
+            size_hint : 0.2 , 1
 
         MDIconButton:
             icon : "update"
@@ -360,6 +363,7 @@
             icon_color: chex('0da42e')
 
         Widget:
+            size_hint : 0.2 , 1
 
         MDIconButton:
             icon : "delete-forever"
@@ -369,6 +373,7 @@
             icon_color: chex('bf090f')
 
         Widget:
+            size_hint : 0.2 , 1
 
 
 <TeachersScreen>:
