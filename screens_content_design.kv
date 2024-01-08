@@ -378,6 +378,11 @@
 
 <TeachersScreen>:
 
+    teacher_schedule : teacher_schedule
+    teacher_image : teacher_image
+    teacher_name : teacher_name
+    teacher_info : teacher_info
+
     FloatLayout:
         size_hint : 1, 1
         canvas.before:
@@ -390,12 +395,14 @@
 
         # Teacher Image
         Image:
+            id : teacher_image
             size_hint : 0.3 , 0.37
             pos_hint : { "top" : 0.93 , "x" : 0.05 }
             source : "pictures/my_picture.jpg"
 
         # Teacher Name
         Label:
+            id : teacher_name
             size_hint : 0.5 , 0.1
             pos_hint : { "top" : 0.92 , "x" : 0.38 }
             text : "Ericson Mark A. Guanzon"
@@ -431,7 +438,7 @@
                 padding : dp(5)
 
                 FacultyScreenLabelForInformation:
-
+                    id : teacher_info
 
         #Teacher Schedule Time
         BoxLayout:
@@ -452,6 +459,7 @@
                 size_hint : 1,  0.85
 
                 MDGridLayout:
+                    id : teacher_schedule
                     adaptive_height : True
                     cols : 1
                     spacing : min(self.parent.size) * 0.02
@@ -519,10 +527,12 @@
     background_color : 0, 0 , 0, 0
     size_hint : 1 , None
     height : min(self.parent.parent.size) * 0.15 if self.parent else dp(100)
+    font_name : "title_font" if self.isSelected else "content_font"
+    color : self.activity_colors['selected'][1] if self.isSelected else self.activity_colors['unselected'][1]
 
     canvas.before:
         Color:
-            rgba : chex("620609")
+            rgba : self.activity_colors['selected'][0] if self.isSelected else self.activity_colors['unselected'][0]
         RoundedRectangle:
             pos : self.pos
             size : self.size
@@ -532,6 +542,9 @@
         self.command()
 
 <FacultyScreen>:
+
+    navigation_buttons : navigation_buttons
+    navigation_screens : navigation_screens
 
     BoxLayout:
         canvas.before:
@@ -563,6 +576,7 @@
                 size_hint : 1 , 0.8
 
                 MDGridLayout:
+                    id : navigation_buttons
                     adaptive_height: True
                     spacing : dp(5)
                     cols : 1
@@ -593,10 +607,7 @@
 
         # Faculty Screens
         ScreenManager:
-
-            TeachersScreen:
-                name : "test"
-
+            id : navigation_screens
 
 
 

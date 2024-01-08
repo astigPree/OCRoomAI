@@ -21,9 +21,10 @@ from content_screens import GuestScreen, FacultyScreen, DeveloperScreen
 class ContentWindow(ScreenManager) :
     listOfScreen = ('guest', 'faculty', 'developer')
 
+
     def on_kv_post(self, base_widget) :
-        self.add_widget(GuestScreen(name=self.listOfScreen[0]))
-        # self.add_widget(FacultyScreen(name=self.listOfScreen[1]))
+        # self.add_widget(GuestScreen(name=self.listOfScreen[0]))
+        self.add_widget(FacultyScreen(name=self.listOfScreen[1]))
         # self.add_widget(DeveloperScreen(name=self.listOfScreen[2]))
 
 
@@ -52,7 +53,7 @@ class MainWindow(FloatLayout) :
         with open(filepath, 'rb' if isBytes else 'r') as file :
             return json.load(file) if not isBytes else pickle.load(file)
 
-    def loadGuestScreenData(self) :
+    def loadScreenData(self) :
         # TODO: Load the teachers and rooms data
         self.__instructor_data = self.loadNeededData(filename="instructors_data.json", folder="locations_informations")
         self.__room_data = self.loadNeededData(filename="locations_data.json", folder="locations_informations")
@@ -101,6 +102,11 @@ class MainWindow(FloatLayout) :
             self.content.get_screen("guest").okeyToChangeScreen()
 
     # ---------------------- READING DATA ------------------------------
+    def hasData(self) -> bool:
+        if self.__room_data and self.__instructor_data:
+            return True
+        return False
+
     def getInstructorData(self) -> dict:
         return self.__instructor_data
 

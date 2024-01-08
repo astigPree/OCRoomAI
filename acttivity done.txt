@@ -13,6 +13,10 @@
     - Design Activity List Holder
     - Design Change Info ModalView
     * Desing Add Schedule ModalView
+[*] BackEnd Faculty Screen
+    - Create Navigation Button Based to the name
+    - Change Screen based on the navigator
+    - Update the teacher navigation screen
 [*] Design Guest Screen
     * Resize the size of text based on how long it is
 [*] Create Backend

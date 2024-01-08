@@ -6,13 +6,15 @@ from kivy.uix.button import Button
 from kivy.uix.modalview import ModalView
 from kivy.uix.dropdown import DropDown
 
+from kivymd.uix.gridlayout import MDGridLayout
+
 from kivy.animation import Animation
 from kivy.clock import Clock
 from kivy.utils import get_color_from_hex as chex
 
 Clock.max_iteration = 60
 
-from kivy.properties import ObjectProperty, ListProperty, BooleanProperty, StringProperty
+from kivy.properties import ObjectProperty, ListProperty, BooleanProperty, StringProperty, DictProperty
 
 from datetime import datetime
 
@@ -48,12 +50,32 @@ class ScheduleContainer(BoxLayout):
 
 
 class TeachersScreen(Screen) :
-    pass
+
+    teacher_schedule: MDGridLayout = ObjectProperty(None)
+    teacher_image: Image = ObjectProperty(None)
+    teacher_name: Label = ObjectProperty(None)
+    teacher_info: Label = ObjectProperty(None)
+
+    teacher_data : dict = ObjectProperty(None)
+
+    def updateDisplay(self, data : dict):
+        self.teacher_info.text = data['information']
+        self.teacher_image.source = data['picture']
+        self.teacher_name.text = data['person']
+
+        # TODO: Update the schedule screen
+
+        self.teacher_data = data
 
 
 class NavigationButton(Button) :
     activity: callable = ObjectProperty(None)
-    activity_colors = {"selected" : (chex("ddacae"), "black"), "unselected" : (chex("620609"), "white")}
+    activity_colors = {
+        "selected" : (chex("ddacae"), "black"),
+        "unselected" : (chex("620609"), "white")
+    }
+
+    isSelected : bool = BooleanProperty(False)
 
     def command(self) :
         if self.activity :
@@ -61,7 +83,57 @@ class NavigationButton(Button) :
 
 
 class FacultyScreen(Screen) :
-    pass
+
+    navigation_buttons : MDGridLayout = ObjectProperty(None)
+    navigation_screens : ScreenManager = ObjectProperty(None)
+
+    room_data : dict = ObjectProperty()
+    instructor_data : dict = ObjectProperty()
+
+    current_screen : str = StringProperty("")
+    list_of_screens : dict[str , TeachersScreen] = DictProperty({})
+
+    def on_pre_enter(self, *args):
+        if self.parent:
+
+            if not self.parent.parent.hasData(): # Check if MainWindow hold the data already
+                self.parent.parent.loadScreenData()
+
+            self.room_data = self.parent.parent.getRoomData()
+            self.instructor_data = self.parent.parent.getInstructorData()
+
+            self.navigation_buttons.clear_widgets()
+            for key , values in self.instructor_data.items():
+
+                # Creating Navigation Button
+                navBut = NavigationButton()
+                navBut.text = values["person"]
+                navBut.activity = self.changeScreen
+                self.navigation_buttons.add_widget(navBut)
+
+                # Creating Navigation Screen
+                screen = TeachersScreen()
+                screen.updateDisplay(values)
+                self.list_of_screens[values['person']] = screen
+
+                # Checking if has screen used
+                if not self.current_screen:
+                    self.changeScreen(values["person"])
+
+            Clock.schedule_interval(self.update , 1 /30)
+
+    def update(self , interval : float ):
+        for child in self.navigation_buttons.children:
+            if child.text == self.current_screen:
+                child.isSelected = True
+            else:
+                if child.isSelected:
+                    child.isSelected = False
+
+    def changeScreen(self, name : str):
+        self.current_screen = name
+        self.navigation_screens.switch_to(self.list_of_screens[name])
+
     #
     # def on_kv_post(self, base_widget):
     #     self.view = AddFacultyScheduleModalView()
@@ -193,7 +265,7 @@ class GuestScreen(Screen) :
 
     def on_enter(self, *args) :
         if self.parent :
-            self.parent.parent.loadGuestScreenData()
+            self.parent.parent.loadScreenData()
 
             instructor_data = self.parent.parent.getInstructorData()
             for name in instructor_data :
