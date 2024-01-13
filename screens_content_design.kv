@@ -138,6 +138,59 @@
 
 
 # ------------------------ Faculty Screens ---------------------
+<FacultyWarningActionsModalView>:
+    background_color : 0 , 0 , 0, 0
+    overlay_color : 0, 0, 0, 0
+
+    canvas.before:
+        Color:
+            rgb : chex('7f0f0f')
+            a : 0.8
+        Rectangle:
+            pos : self.pos
+            size : self.size
+
+    BoxLayout:
+        size_hint : 0.5, 0.6
+        pos_hint : { 'center_x' : 0.5 , 'center_y' : 0.5 }
+        orientation : 'vertical'
+        padding : min(self.size) * 0.05
+        spacing : min(self.size) * 0.01
+
+        canvas.before:
+            Color :
+                rgba : chex('f0f3f4')
+            RoundedRectangle:
+                pos : self.pos
+                size : self.size
+                radius : ( min(self.size) * 0.1, )
+
+        ScrollView:
+            size_hint : 1 , 0.8
+
+            MDGridLayout:
+                adaptive_height : True
+                cols : 1
+
+                Label:
+                    text : "A" * 670
+                    size_hint : 1, None
+                    text_size: self.width - dp(20), None
+                    height : self.texture_size[1]
+                    font_size : min(root.size) * 0.04
+                    color : chex('7f0f0f')
+
+        BoxLayout:
+            size_hint : 1 , 0.2
+            padding : min(self.size) * 0.2
+            spacing : min(self.size) * 0.3
+
+            ChangeFacultyInfoModalViewButtonUpdate:
+
+            ChangeFacultyInfoModalViewButtonCancel:
+                on_release:
+                    root.dismiss()
+
 <AddFacultyScheduleModalView>:
     background_color : 0 , 0 , 0, 0
     overlay_color : 0, 0, 0, 0
@@ -174,30 +227,27 @@
             Label:
                 text : "L O C A T I O N :"
                 font_name : "title_font"
-                font_size : min(self.size) * 0.4
+                font_size : min(self.size) * 0.45
                 size_hint : 0.4 ,1
                 color : "black"
 
-
-            Button :
+            MDFillRoundFlatButton :
                 id : location_dropdown
-                size_hint : 0.6 , 1
-                background_color : 0 , 0 , 0 , 0
+                size_hint : 0.6 , 0.9
+                md_bg_color : chex('7f0f0f')
+                text : "Select Location"
+                font_size : min(self.size)  * 0.25
+                font_name : "title_font"
 
-                canvas.before:
-                    Color:
-                        rgba: chex('7f0f0f')
-                    RoundedRectangle:
-                        pos : self.pos
-                        size : self.size
-                        radius : ( min(self.size) * 0.1, )
+                on_release:
+                    root.dropdown_list.open(*args)
 
         BoxLayout:
             size_hint : 1 , 0.6
             orientation : 'vertical'
 
             BoxLayout:
-                size_hint : 1 , 0.3
+                size_hint : 1 , 0.5
 
                 AddFacultyScheduleModalViewLabel:
                     text : "START TIME"
@@ -205,16 +255,39 @@
                 AddFacultyScheduleModalViewLabel:
                     text : "END TIME"
 
-
             BoxLayout:
-                size_hint : 1 , 0.7
+                size_hint : 1 , 0.2
+                padding : [ dp(20) , dp(0) , dp(20) , dp(0) ]
+                spacing : dp(30)
 
-                ChangeFacultyInfoModalViewButtonCancel:
+                FacultyTimePickerButton:
+                    text : root.time_start
+                    size_hint : 0.5 , 1
+                    font_size : min(root.size) * 0.03
+                    on_release:
+                        root.time_selections.start_time_picker.open()
 
-                ChangeFacultyInfoModalViewButtonCancel:
+                FacultyTimePickerButton:
+                    text : root.time_start
+                    size_hint : 0.5 , 1
+                    font_size : min(root.size) * 0.03
+                    on_release:
+                        root.time_selections.end_time_picker.open()
 
-        Widget:
+            Widget :
+                size_hint : 1 , 0.3
+
+        BoxLayout:
             size_hint : 1 , 0.2
+            padding : min(self.size) * 0.2
+            spacing : min(self.size) * 0.3
+
+            ChangeFacultyInfoModalViewButtonUpdate:
+
+            ChangeFacultyInfoModalViewButtonCancel:
+                on_release:
+                    root.dismiss()
+
 
 <ChangeFacultyInfoModalView>:
     background_color : 0 , 0 , 0, 0
@@ -317,6 +390,8 @@
             ChangeFacultyInfoModalViewButtonUpdate:
 
             ChangeFacultyInfoModalViewButtonCancel:
+                on_release:
+                    root.dismiss()
 
 
 <ScheduleContainer>:
@@ -333,7 +408,7 @@
     Label:
         size_hint : None , 1
         width : root.size[0] / len(root.children)
-        text : "AVR"
+        text : root.room
         font_name : "content_font"
         font_size : min(self.size) * 0.5
         color : chex("620609")
@@ -341,7 +416,7 @@
     Label:
         size_hint : None , 1
         width : root.size[0] / len(root.children)
-        text : "12:00 - 13:00"
+        text : root.schedule
         font_name : "content_font"
         font_size : min(self.size) * 0.5
         color : chex("620609")
@@ -465,13 +540,6 @@
                     spacing : min(self.parent.size) * 0.02
                     padding : min(self.size) * 0.1
 
-                    ScheduleContainer:
-
-                    ScheduleContainer:
-
-                    ScheduleContainer:
-
-                    ScheduleContainer:
 
         # Teacher Activity
         BoxLayout:
@@ -509,15 +577,29 @@
                 FacultyScreenActivityButton:
                     text : "Change Info"
                     color : chex("620609")
+                    on_release:
+                        root.change_faculty_info.open()
+
                 FacultyScreenActivityButton:
                     text : "Add Schedule"
                     color : chex("620609")
+
+                    on_release:
+                        root.add_schedule.open()
+
                 FacultyScreenActivityButton:
                     text : "Apply Change"
                     color : chex('0da42e')
+
+                    on_release :
+                        root.warning.open()
+
                 FacultyScreenActivityButton:
                     text : "Reset Schedule"
                     color : chex('bf090f')
+
+                    on_release :
+                        root.warning.open()
 
 
 <NavigationButton>:
@@ -581,28 +663,6 @@
                     spacing : dp(5)
                     cols : 1
                     padding : [ dp(5) , dp(20) , dp(5), dp(0) ]
-
-                    NavigationButton:
-                        text : "Justine S. Aban"
-
-                    NavigationButton:
-                        text : "Ericson Mark A. Guanzon"
-                        font_name : "title_font"
-                        color : chex("620609")
-
-                        canvas.before:
-                            Color:
-                                rgba : chex("ddacae")
-                            RoundedRectangle:
-                                pos : self.pos
-                                size : self.size
-                                radius : ( min(self.size) * 0.6, )
-
-                    NavigationButton:
-                        text : "Jovelyn B. Patalinghug"
-
-                    NavigationButton:
-                        text : "Laila L. Dieto"
 
 
         # Faculty Screens
@@ -737,3 +797,16 @@
             pos : self.pos
             size : self.size
             radius : ( min(self.size) * 0.4, )
+
+<FacultySelectionLocationDropdownContent>:
+    orientation : 'vertical'
+    adaptive_height : True
+    md_bg_color : chex('DABBBB')
+    padding : dp(10)
+    spacing : dp(5)
+    radius : ( 24 , )
+
+<FacultyTimePickerButton@MDFillRoundFlatButton>:
+    md_bg_color : chex("620609")
+    font_name : "title_font"
+    text : "Select Time"

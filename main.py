@@ -1,5 +1,5 @@
-# from kivy.config import Config
-# Config.set('graphics', 'fullscreen', 'auto')
+from kivy.config import Config
+Config.set('graphics', 'fullscreen', 'auto')
 
 from kivymd.app import MDApp
 from kivy.uix.floatlayout import FloatLayout
@@ -19,13 +19,17 @@ from content_screens import GuestScreen, FacultyScreen, DeveloperScreen
 
 
 class ContentWindow(ScreenManager) :
-    listOfScreen = ('guest', 'faculty', 'developer')
-
+    listOfScreen = { 'guest' : GuestScreen , 'faculty' : FacultyScreen , 'dev' : DeveloperScreen}
 
     def on_kv_post(self, base_widget) :
+        screen = self.listOfScreen['faculty']()
+        self.switch_to(screen)
         # self.add_widget(GuestScreen(name=self.listOfScreen[0]))
-        self.add_widget(FacultyScreen(name=self.listOfScreen[1]))
+        # self.add_widget(FacultyScreen(name=self.listOfScreen[1]))
         # self.add_widget(DeveloperScreen(name=self.listOfScreen[2]))
+
+    def switchScreenByName(self, name : str):
+        self.switch_to(self.listOfScreen[name]())
 
 
 class MainWindow(FloatLayout) :
@@ -43,6 +47,9 @@ class MainWindow(FloatLayout) :
     __instructor_data : dict = ObjectProperty(None)
     __room_data : dict = ObjectProperty(None)
     __commands_pattern : dict = ObjectProperty(None)
+    __commands_metadata : dict = ObjectProperty(None)
+
+    __current_command : str = StringProperty("") # Used to control the manage the whole system
 
     from backend.algo_recognation import recognizeAlgo
 
@@ -58,10 +65,11 @@ class MainWindow(FloatLayout) :
         self.__instructor_data = self.loadNeededData(filename="instructors_data.json", folder="locations_informations")
         self.__room_data = self.loadNeededData(filename="locations_data.json", folder="locations_informations")
         self.__commands_pattern = self.loadNeededData(filename="command_keywords.json")
+        self.__commands_metadata = self.loadNeededData(filename="commands_metadata.json")
 
     def on_kv_post(self, base_widget):
+        print(f"The String does not value {not self.__current_command}")
         self.ids['picture'].ids['picture'].source = os.path.join(os.path.dirname(__file__), 'pictures', 'building.jpg')
-        print("Happen ------------------------------------------------")
 
         Clock.schedule_interval(self.updateScrolling , 1/30)
 
@@ -94,6 +102,9 @@ class MainWindow(FloatLayout) :
         Clock.schedule_once(lambda x : self.animateDisplayTalking(int(talking_speed)))
 
     # ---------------------- WRITING DATA ------------------------------
+    def updateNewCommand(self, command : str):
+        self.__current_command = command
+
     def updateAIText(self, text : str):
         self.__ai_talking = text
 
@@ -102,6 +113,10 @@ class MainWindow(FloatLayout) :
             self.content.get_screen("guest").okeyToChangeScreen()
 
     # ---------------------- READING DATA ------------------------------
+    @property
+    def COMMAND(self) -> str:
+        return self.__current_command
+
     def hasData(self) -> bool:
         if self.__room_data and self.__instructor_data:
             return True
@@ -125,6 +140,9 @@ class MainWindow(FloatLayout) :
     def getGuestScreenData(self, name : str):
         return self.content.current_screen.screens_handler.get_screen(name).getScreenInformation()
 
+    def hasCommandInBackEnd(self , command) -> dict:
+        return self.__commands_metadata.get(command , {'isBackend' : False})
+
 
 class RoomAIApp(MDApp) :
 
@@ -137,7 +155,6 @@ class RoomAIApp(MDApp) :
         import cProfile
         self.profile = cProfile.Profile()
         self.profile.enable()
-
 
         Thread(target=self.root.recognizeAlgo).start()
 

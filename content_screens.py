@@ -6,7 +6,10 @@ from kivy.uix.button import Button
 from kivy.uix.modalview import ModalView
 from kivy.uix.dropdown import DropDown
 
+from kivymd.uix.pickers import MDTimePicker
 from kivymd.uix.gridlayout import MDGridLayout
+from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.button import MDFillRoundFlatButton
 
 from kivy.animation import Animation
 from kivy.clock import Clock
@@ -14,31 +17,75 @@ from kivy.utils import get_color_from_hex as chex
 
 Clock.max_iteration = 60
 
-from kivy.properties import ObjectProperty, ListProperty, BooleanProperty, StringProperty, DictProperty
+from kivy.properties import ObjectProperty, ListProperty, BooleanProperty, StringProperty, DictProperty, NumericProperty
 
-from datetime import datetime
+from datetime import datetime, time
 
 
 # ------------------------ Faculty Screens ----------------------
-class AddFacultyScheduleModalViewTimeSelections(BoxLayout):
+class FacultyWarningActionsModalView(ModalView):
     pass
 
 
+class FacultySelectionLocationDropdownContent(MDBoxLayout):
+    pass
+
+
+class AddFacultyScheduleModalViewTimeSelections(BoxLayout):
+
+    start_time : time = ObjectProperty(None)
+    end_time : time = ObjectProperty(None)
+
+    def __init__(self, **kwargs):
+        super(AddFacultyScheduleModalViewTimeSelections , self).__init__(**kwargs)
+        self.start_time_picker = MDTimePicker()
+        self.end_time_picker = MDTimePicker()
+
+        # Customize the input
+        self.start_time_picker.bind(time=self.get_start_time)
+        self.end_time_picker.bind(time=self.get_end_time)
+
+    def get_start_time(self, _ , selected_time):
+        self.start_time = selected_time
+
+    def get_end_time(self, _ , selected_time):
+        self.end_time = selected_time
+
+
 class AddFacultyScheduleModalView(ModalView):
-    location_dropdown : Button = ObjectProperty()
+    location_dropdown : MDFillRoundFlatButton = ObjectProperty()
     dropdown_list = DropDown()
 
-    def on_kv_post(self, base_widget):
-        for index in range(10) :
+    time_selections : AddFacultyScheduleModalViewTimeSelections = ObjectProperty(None)
 
-            btn = Button(text='Value %d' % index, size_hint_y=None, height=44)
-            btn.bind(on_release=lambda btn : self.dropdown_list.select(self.location_dropdown.text))
+    time_start : str = StringProperty("Select Time")
+    time_end : str = StringProperty("Select Time")
+    isUsedAlready : bool = BooleanProperty(False)
 
-            # then add the button inside the dropdown
-            self.dropdown_list.add_widget(btn)
+    def changeLocation(self , location : str):
+        self.location_dropdown.text = location
+        print(location)
+        self.dropdown_list.dismiss()
 
-        self.location_dropdown.bind(on_release=self.dropdown_list.open)
-        self.dropdown_list.bind(on_select=lambda instance, x : setattr(self.location_dropdown, 'text', x))
+    def on_open(self):
+        if not self.isUsedAlready:
+            # TODO: Get the locations in the parents and display it in the dropdown list
+            content_box = FacultySelectionLocationDropdownContent()
+            for index in range(20) :
+                btn = MDFillRoundFlatButton(
+                    text=f"Value {index}", size_hint=(1, None),
+                    height=44 , md_bg_color =  chex("620609") ,
+                    font_name = "ai_font" , font_size = min(self.size) * 0.03
+                )
+                # btn.bind(on_release = lambda x : self.changeLocation(f"Value {index}"))
+                content_box.add_widget(btn)
+
+            self.dropdown_list.add_widget(content_box)
+            # self.dropdown_list.bind(on_select=lambda instance, x : setattr(self.location_dropdown, 'text', x))
+
+            self.isUsedAlready = True
+
+            self.time_selections = AddFacultyScheduleModalViewTimeSelections()
 
 
 class ChangeFacultyInfoModalView(ModalView):
@@ -46,7 +93,14 @@ class ChangeFacultyInfoModalView(ModalView):
 
 
 class ScheduleContainer(BoxLayout):
-    pass
+    parent_index : int = NumericProperty(0)
+    room : str = StringProperty('')
+    schedule : str = StringProperty('')
+
+    def updateOnCreate(self , index : int , room : str ,schedule : str):
+        self.parent_index = index
+        self.room = room.upper()
+        self.schedule = schedule
 
 
 class TeachersScreen(Screen) :
@@ -58,10 +112,27 @@ class TeachersScreen(Screen) :
 
     teacher_data : dict = ObjectProperty(None)
 
+    def __init__(self, **kwargs):
+        super(TeachersScreen, self).__init__(**kwargs)
+        self.change_faculty_info = ChangeFacultyInfoModalView()
+        self.add_schedule = AddFacultyScheduleModalView()
+        self.warning = FacultyWarningActionsModalView()
+
     def updateDisplay(self, data : dict):
+        # Update the display contain in schedule of each teacher
         self.teacher_info.text = data['information']
         self.teacher_image.source = data['picture']
         self.teacher_name.text = data['person']
+
+        index = 0 # Used to identify the index in parent children
+        for room in data['locations']:
+            for schedule_time in data['locations'][room]:
+                container = ScheduleContainer()
+                container.updateOnCreate(index , room ,schedule_time)
+                self.teacher_schedule.add_widget(container)
+                index += 1
+
+
 
         # TODO: Update the schedule screen
 
@@ -178,8 +249,6 @@ class LocationScreenInformation(Screen) :
 
     def on_enter(self, *args) :
         self.enter_animate.start(self)
-
-    def on_pre_enter(self, *args) :
         self.updateOnlyTeacherScreen()
 
     def on_leave(self, *args) :
@@ -235,7 +304,6 @@ class LocationScreenInformation(Screen) :
                     time_start = self.time_parser(time_start, self.time_format)
                     time_end = self.time_parser(time_end, self.time_format)
                     self.teacher_time.append((location, time_start, time_end))
-            self.updateOnlyTeacherScreen()
 
 
 class GuestScreen(Screen) :
