@@ -293,6 +293,9 @@
     background_color : 0 , 0 , 0, 0
     overlay_color : 0, 0, 0, 0
 
+    teacher_name : teacher_name
+    teacher_info : teacher_info
+
     canvas.before:
         Color:
             rgb : chex('7f0f0f')
@@ -338,6 +341,7 @@
                         radius : ( min(self.size) * 0.1, )
 
                 TextInput :
+                    id : teacher_name
                     size_hint : 1 , 1
                     background_color : 0, 0 , 0 , 0
                     cursor_color : chex('f0f3f4')
@@ -372,6 +376,7 @@
                         radius : ( min(self.size) * 0.1, )
 
                 TextInput :
+                    id : teacher_info
                     size_hint : 1 , 1
                     background_color : 0, 0 , 0 , 0
                     cursor_color : chex('f0f3f4')
@@ -382,12 +387,15 @@
                     valign : "center"
 
 
+
         BoxLayout:
             size_hint : 1 , 0.2
             padding : min(self.size) * 0.2
             spacing : min(self.size) * 0.3
 
             ChangeFacultyInfoModalViewButtonUpdate:
+                on_release:
+                    root.updateParentInfo()
 
             ChangeFacultyInfoModalViewButtonCancel:
                 on_release:
@@ -446,6 +454,9 @@
             size_hint : 0.3 , 1
             theme_icon_color: "Custom"
             icon_color: chex('bf090f')
+
+            on_release:
+                root.deleteSchedule(root.parent_index)
 
         Widget:
             size_hint : 0.2 , 1
@@ -599,11 +610,12 @@
                     color : chex('bf090f')
 
                     on_release :
+                        root.resetSchedule()
                         root.warning.open()
 
 
 <NavigationButton>:
-    font_size : min(self.size) * 0.4
+    font_size : ( min(self.size) * 0.67 ) - ( len(self.text) * 0.43) if len(self.text) > 10 else (min(self.size) * 0.5 )
     font_name : "content_font"
     background_down : ""
     background_color : 0, 0 , 0, 0

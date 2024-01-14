@@ -51,7 +51,18 @@ class MainWindow(FloatLayout) :
 
     __current_command : str = StringProperty("") # Used to control the manage the whole system
 
+    __room_filename= ( "locations_data.json", "locations_informations")
+    __instructor_filename = ("instructors_data.json", "locations_informations")
+
     from backend.algo_recognation import recognizeAlgo
+
+    @property
+    def room_filename(self) -> tuple[str , str]:
+        return self.__room_filename
+
+    @property
+    def instructor_filename(self) -> tuple[str, str]:
+        return self.__instructor_filename
 
     @staticmethod
     def loadNeededData( filename: str, folder=None, isBytes=False) -> dict :
@@ -60,10 +71,17 @@ class MainWindow(FloatLayout) :
         with open(filepath, 'rb' if isBytes else 'r') as file :
             return json.load(file) if not isBytes else pickle.load(file)
 
+    @staticmethod
+    def saveNewData( filename : str, data : dict, folder = None , isBytes = False):
+        filepath = os.path.join(os.path.dirname(__file__), folder, filename) if folder else os.path.join(
+            os.path.dirname(__file__), filename)
+        with open(filepath, 'wb' if isBytes else 'w') as file :
+            return json.dump(data, file) if not isBytes else pickle.dump(data, file)
+
     def loadScreenData(self) :
         # TODO: Load the teachers and rooms data
-        self.__instructor_data = self.loadNeededData(filename="instructors_data.json", folder="locations_informations")
-        self.__room_data = self.loadNeededData(filename="locations_data.json", folder="locations_informations")
+        self.__instructor_data = self.loadNeededData(filename=self.__instructor_filename[0], folder=self.__instructor_filename[1])
+        self.__room_data = self.loadNeededData(filename=self.__room_filename[0], folder=self.__room_filename[1])
         self.__commands_pattern = self.loadNeededData(filename="command_keywords.json")
         self.__commands_metadata = self.loadNeededData(filename="commands_metadata.json")
 

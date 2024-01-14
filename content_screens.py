@@ -5,6 +5,7 @@ from kivy.uix.image import Image
 from kivy.uix.button import Button
 from kivy.uix.modalview import ModalView
 from kivy.uix.dropdown import DropDown
+from kivy.uix.textinput import TextInput
 
 from kivymd.uix.pickers import MDTimePicker
 from kivymd.uix.gridlayout import MDGridLayout
@@ -89,13 +90,28 @@ class AddFacultyScheduleModalView(ModalView):
 
 
 class ChangeFacultyInfoModalView(ModalView):
-    pass
 
+    teacher_name : TextInput = ObjectProperty(None)
+    teacher_info : TextInput = ObjectProperty(None)
+
+    holder : object = ObjectProperty(None)
+
+    updateInfo : callable = ObjectProperty(None)
+
+    def on_pre_open(self):
+        self.teacher_name.text = self.holder.teacher_name.text
+        self.teacher_info.text = self.holder.teacher_info.text
+
+    def updateParentInfo(self):
+        self.updateInfo(self.teacher_name.text, self.teacher_info.text)
+        self.dismiss()
 
 class ScheduleContainer(BoxLayout):
     parent_index : int = NumericProperty(0)
     room : str = StringProperty('')
     schedule : str = StringProperty('')
+
+    deleteSchedule : callable = ObjectProperty(None)
 
     def updateOnCreate(self , index : int , room : str ,schedule : str):
         self.parent_index = index
@@ -111,12 +127,18 @@ class TeachersScreen(Screen) :
     teacher_info: Label = ObjectProperty(None)
 
     teacher_data : dict = ObjectProperty(None)
+    teacher_key : str = StringProperty("")
 
     def __init__(self, **kwargs):
         super(TeachersScreen, self).__init__(**kwargs)
         self.change_faculty_info = ChangeFacultyInfoModalView()
         self.add_schedule = AddFacultyScheduleModalView()
         self.warning = FacultyWarningActionsModalView()
+
+        self.change_faculty_info.holder = self
+        self.change_faculty_info.updateInfo = self.updateNameAndInfo
+        self.add_schedule.holder = self
+        self.warning.holder = self
 
     def updateDisplay(self, data : dict):
         # Update the display contain in schedule of each teacher
@@ -125,18 +147,31 @@ class TeachersScreen(Screen) :
         self.teacher_name.text = data['person']
 
         index = 0 # Used to identify the index in parent children
+        self.teacher_schedule.clear_widgets() # Clear the display widgets
         for room in data['locations']:
             for schedule_time in data['locations'][room]:
                 container = ScheduleContainer()
                 container.updateOnCreate(index , room ,schedule_time)
+                container.deleteSchedule = self.removeSchedule
                 self.teacher_schedule.add_widget(container)
                 index += 1
-
-
 
         # TODO: Update the schedule screen
 
         self.teacher_data = data
+
+    def removeSchedule(self, index : int):
+        schedule = self.teacher_schedule.children[index]
+        self.teacher_data['locations'][schedule.room.lower()].remove(schedule.schedule)
+        self.teacher_schedule.remove_widget(schedule)
+
+    def updateNameAndInfo(self, name : str , info : str):
+        self.teacher_info.text = info if len(info) else self.teacher_info.text
+        self.teacher_name.text = name if len(name) else self.teacher_name.text
+
+    def resetSchedule(self):
+        self.teacher_data['locations'] = {}
+        self.teacher_schedule.clear_widgets()
 
 
 class NavigationButton(Button) :
@@ -147,10 +182,11 @@ class NavigationButton(Button) :
     }
 
     isSelected : bool = BooleanProperty(False)
+    name : str = StringProperty("")
 
     def command(self) :
         if self.activity :
-            self.activity(self.text)
+            self.activity(self.name)
 
 
 class FacultyScreen(Screen) :
@@ -180,22 +216,23 @@ class FacultyScreen(Screen) :
                 navBut = NavigationButton()
                 navBut.text = values["person"]
                 navBut.activity = self.changeScreen
+                navBut.name = key
                 self.navigation_buttons.add_widget(navBut)
 
                 # Creating Navigation Screen
                 screen = TeachersScreen()
                 screen.updateDisplay(values)
-                self.list_of_screens[values['person']] = screen
+                self.list_of_screens[key] = screen
 
                 # Checking if has screen used
                 if not self.current_screen:
-                    self.changeScreen(values["person"])
+                    self.changeScreen(key)
 
             Clock.schedule_interval(self.update , 1 /30)
 
     def update(self , interval : float ):
         for child in self.navigation_buttons.children:
-            if child.text == self.current_screen:
+            if child.name == self.current_screen:
                 child.isSelected = True
             else:
                 if child.isSelected:
@@ -203,13 +240,41 @@ class FacultyScreen(Screen) :
 
     def changeScreen(self, name : str):
         self.current_screen = name
+        self.list_of_screens[name].updateDisplay(self.instructor_data[name])
         self.navigation_screens.switch_to(self.list_of_screens[name])
+        self.update_navigation_content()
 
-    #
-    # def on_kv_post(self, base_widget):
-    #     self.view = AddFacultyScheduleModalView()
-    #
-    #     Clock.schedule_once(lambda x : self.view.open() , 1)
+    def update_navigation_content(self):
+        for nav_button in self.navigation_buttons.children:
+            nav_button.text = self.instructor_data[nav_button.name]['person']
+
+    def update_instructor_data(self, instructor : str, name = None , information = None , locations = None ):
+        """
+        :param instructor: the key string for data structure
+        :param name: new name of the instructor
+        :param information: new information of the instructor
+        :param locations: new data for new locations; structure = { room : [ start time - end time, ... ] }
+        :return: None
+        """
+
+        instructor_data = self.instructor_data.get(instructor , None)
+
+        if not instructor_data:
+            print(f"[!] Instructor does not exist ; {instructor_data}")
+            return
+
+        if name:
+            instructor_data['person'] = name
+        if information:
+            instructor_data['information'] = information
+        if locations:
+            instructor_data['locations'] = locations
+
+        self.instructor_data[instructor] = instructor_data
+        filename , folder = self.parent.parent.instructor_filename()
+        self.parent.parent.saveNewData(filename=filename , data= self.instructor_data , folder=folder)
+
+        self.update_navigation_content()
 
 
 # ------------------------ Guest Screens ----------------------

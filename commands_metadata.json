@@ -1,0 +1,27 @@
+{
+  "change" : {
+    "action" : "change new screen",
+    "contradiction" : null,
+    "isBackend" : false
+  },
+  "unactivated" : {
+    "action" : "close the voice speaker",
+    "contradiction" : "activated",
+    "isBackend" : true
+  },
+  "shutdown" : {
+    "action" : "do nothing to the whole program activity",
+    "contradiction" : "open",
+    "isBackend" : true
+  },
+  "activated" : {
+    "action" : "open the voice speaker",
+    "contradiction" : "unactivated",
+    "isBackend" : true
+  },
+  "open" : {
+    "action" : "activate the whole program activity",
+    "contradiction" : "shutdown",
+    "isBackend" : true
+  }
+}
