@@ -19,6 +19,7 @@
     - Update the teacher navigation screen
     - Update the data when there is remove schedule
     - Update the user information in display
+    * Update the schedule when new one is entered
 [*] Design Guest Screen
     * Resize the size of text based on how long it is
 [*] Create Backend

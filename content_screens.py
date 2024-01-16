@@ -16,16 +16,22 @@ from kivy.animation import Animation
 from kivy.clock import Clock
 from kivy.utils import get_color_from_hex as chex
 
-Clock.max_iteration = 60
-
 from kivy.properties import ObjectProperty, ListProperty, BooleanProperty, StringProperty, DictProperty, NumericProperty
-
 from datetime import datetime, time
+
+Clock.max_iteration = 60
 
 
 # ------------------------ Faculty Screens ----------------------
+class FacultyDropDownButton(MDFillRoundFlatButton):
+    command : callable = ObjectProperty(None)
+
+    def on_release(self):
+        self.command(self.text)
+
+
 class FacultyWarningActionsModalView(ModalView):
-    pass
+    isUsedToDisplay : bool = BooleanProperty(False) # Used to check if the modal is used for displaying only or not
 
 
 class FacultySelectionLocationDropdownContent(MDBoxLayout):
@@ -63,23 +69,22 @@ class AddFacultyScheduleModalView(ModalView):
     time_end : str = StringProperty("Select Time")
     isUsedAlready : bool = BooleanProperty(False)
 
+    holder : Screen = ObjectProperty(None)
+
     def changeLocation(self , location : str):
         self.location_dropdown.text = location
-        print(location)
         self.dropdown_list.dismiss()
 
     def on_open(self):
         if not self.isUsedAlready:
             # TODO: Get the locations in the parents and display it in the dropdown list
+            rooms = self.holder.parent.parent.parent.getAllRooms()  # TeachersScreen > ScreenManager > BoxLayout > FacultyScreen
             content_box = FacultySelectionLocationDropdownContent()
-            for index in range(20) :
-                btn = MDFillRoundFlatButton(
-                    text=f"Value {index}", size_hint=(1, None),
-                    height=44 , md_bg_color =  chex("620609") ,
-                    font_name = "ai_font" , font_size = min(self.size) * 0.03
-                )
-                # btn.bind(on_release = lambda x : self.changeLocation(f"Value {index}"))
-                content_box.add_widget(btn)
+            for room in rooms :
+                dropButton = FacultyDropDownButton( text=room )
+                dropButton.command = self.changeLocation
+
+                content_box.add_widget(dropButton)
 
             self.dropdown_list.add_widget(content_box)
             # self.dropdown_list.bind(on_select=lambda instance, x : setattr(self.location_dropdown, 'text', x))
@@ -105,6 +110,7 @@ class ChangeFacultyInfoModalView(ModalView):
     def updateParentInfo(self):
         self.updateInfo(self.teacher_name.text, self.teacher_info.text)
         self.dismiss()
+
 
 class ScheduleContainer(BoxLayout):
     parent_index : int = NumericProperty(0)
@@ -229,6 +235,9 @@ class FacultyScreen(Screen) :
                     self.changeScreen(key)
 
             Clock.schedule_interval(self.update , 1 /30)
+
+    def getAllRooms(self) -> tuple[str , ...] :
+        return tuple( self.room_data[room]['name'] for room in self.room_data )
 
     def update(self , interval : float ):
         for child in self.navigation_buttons.children:
