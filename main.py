@@ -22,7 +22,7 @@ class ContentWindow(ScreenManager) :
     listOfScreen = { 'guest' : GuestScreen , 'faculty' : FacultyScreen , 'dev' : DeveloperScreen}
 
     def on_kv_post(self, base_widget) :
-        screen = self.listOfScreen['faculty']()
+        screen = self.listOfScreen['guest']()
         self.switch_to(screen)
         # self.add_widget(GuestScreen(name=self.listOfScreen[0]))
         # self.add_widget(FacultyScreen(name=self.listOfScreen[1]))
@@ -185,4 +185,7 @@ if __name__ == "__main__" :
     LabelBase.register(name="ai_font", fn_regular="fonts/OpenSans-Semibold.ttf")
     LabelBase.register(name="title_font" , fn_regular="fonts/OpenSans-Bold.ttf")
     LabelBase.register(name="content_font" , fn_regular="fonts/OpenSans-Regular.ttf")
-    RoomAIApp().run()
+    try :
+        RoomAIApp().run()
+    except Exception as e:
+        print(f"Main Error : {e.with_traceback(Exception)}")

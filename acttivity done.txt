@@ -21,7 +21,7 @@
     - Update the user information in display
     * Update the schedule when new one is entered
 [*] Design Guest Screen
-    * Resize the size of text based on how long it is
+    - Resize the size of text based on how long it is
 [*] Create Backend
     * handle main command
 [*] Handle Command in Speech Recognition
