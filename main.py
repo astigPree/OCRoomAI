@@ -6,6 +6,8 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
+from kivy.uix.modalview import ModalView
+from kivy.uix.textinput import TextInput
 
 from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, NumericProperty
 from kivy.lang.builder import Builder
@@ -18,18 +20,43 @@ import os, pickle, json , typing
 from content_screens import GuestScreen, FacultyScreen, DeveloperScreen
 
 
+class LogInView(ModalView):
+    duration = 10 # Duration of login
+
+    username: TextInput = ObjectProperty()
+    password: TextInput = ObjectProperty()
+    timer : int = NumericProperty(duration)
+
+    command : callable = ObjectProperty()
+    main_event : Clock = None
+
+    def startTimer(self , *args):
+        if self.timer <= 0:
+            self.dismiss()
+            return
+
+        self.timer -= 1
+        self.main_event = Clock.schedule_once(self.startTimer , 1)
+
+    def on_dismiss(self):
+        self.timer = self.duration
+        Clock.unschedule(self.main_event)
+
+    def on_open(self):
+        self.main_event = Clock.schedule_once(self.startTimer , 1)
+
+
 class ContentWindow(ScreenManager) :
     listOfScreen = { 'guest' : GuestScreen , 'faculty' : FacultyScreen , 'dev' : DeveloperScreen}
 
-    def on_kv_post(self, base_widget) :
+    def on_parent(self, *args) :
         screen = self.listOfScreen['guest']()
         self.switch_to(screen)
-        # self.add_widget(GuestScreen(name=self.listOfScreen[0]))
-        # self.add_widget(FacultyScreen(name=self.listOfScreen[1]))
-        # self.add_widget(DeveloperScreen(name=self.listOfScreen[2]))
 
     def switchScreenByName(self, name : str):
+        current_screen = self.current_screen
         self.switch_to(self.listOfScreen[name]())
+        self.remove_widget(current_screen)
 
 
 class MainWindow(FloatLayout) :
@@ -54,7 +81,12 @@ class MainWindow(FloatLayout) :
     __room_filename= ( "locations_data.json", "locations_informations")
     __instructor_filename = ("instructors_data.json", "locations_informations")
 
-    from backend.algo_recognation import recognizeAlgo
+    from backend.algo_recognation import recognizeAlgo , whatScreen
+
+    def __init__(self , **kwargs):
+        super(MainWindow, self).__init__(**kwargs)
+        self.login = LogInView()
+        self.login.command = self.changeScreen
 
     @property
     def room_filename(self) -> tuple[str , str]:
@@ -118,6 +150,17 @@ class MainWindow(FloatLayout) :
         self.display_talking.text = ""
         self.__ai_talking = text
         Clock.schedule_once(lambda x : self.animateDisplayTalking(int(talking_speed)))
+
+    def changeScreen(self, username : str , password : str):
+        """Use to change screen with login modal view """
+        screen = self.whatScreen(username , password)
+
+        if not screen:
+            self.login.timer = 0
+            return
+
+        self.content.switchScreenByName(screen)
+        self.login.dismiss()
 
     # ---------------------- WRITING DATA ------------------------------
     def updateNewCommand(self, command : str):
@@ -188,4 +231,4 @@ if __name__ == "__main__" :
     try :
         RoomAIApp().run()
     except Exception as e:
-        print(f"Main Error : {e.with_traceback(Exception)}")
+        print(f"Main Error : {e.with_traceback(None)}")

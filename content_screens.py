@@ -104,6 +104,9 @@ class AddFacultyScheduleModalView(ModalView) :
     location_dropdown: MDFillRoundFlatButton = ObjectProperty()
     dropdown_list = DropDown()
 
+    day_selection : MDFillRoundFlatButton = ObjectProperty()
+    days_dropdown_list = DropDown()
+
     time_selections: AddFacultyScheduleModalViewTimeSelections = ObjectProperty(None)
     start_time: str = StringProperty("SELECT TIME")
     end_time: str = StringProperty("SELECT TIME")
@@ -116,6 +119,10 @@ class AddFacultyScheduleModalView(ModalView) :
         self.location_dropdown.text = location
         self.dropdown_list.dismiss()
 
+    def changeDay(self, day : str):
+        self.day_selection.text = day
+        self.days_dropdown_list.dismiss()
+
     def updatingNewSchedule(self) :
         isCorrect, result = self.time_selections.checkingIfCorrectSelectionOfTime()
 
@@ -123,6 +130,8 @@ class AddFacultyScheduleModalView(ModalView) :
             self.holder.warning.displayError(result)
         elif self.location_dropdown.text == "Select Location" :
             self.holder.warning.displayError("Please specify what room you want to stay-in for the time being")
+        elif self.day_selection.text == "Select Day" :
+            self.holder.warning.displayError("Please specify what day you want to stay-in for the time being")
         else :
             def command():
                 self.holder.addSchedule( f"{self.time_selections.time_start}-{self.time_selections.time_end}", self.location_dropdown.text)
@@ -136,6 +145,7 @@ class AddFacultyScheduleModalView(ModalView) :
         self.start_time = "SELECT TIME"
         self.end_time = "SELECT TIME"
         self.location_dropdown.text = "Select Location"
+        self.day_selection.text = "Select Day"
 
         self.dismiss()
 
@@ -151,7 +161,14 @@ class AddFacultyScheduleModalView(ModalView) :
                 content_box.add_widget(dropButton)
 
             self.dropdown_list.add_widget(content_box)
-            # self.dropdown_list.bind(on_select=lambda instance, x : setattr(self.location_dropdown, 'text', x))
+
+            content_box = FacultySelectionLocationDropdownContent()
+            for day in ("MONDAY" , "TUESDAY" , "WENDSDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY" ):
+                dropButton = FacultyDropDownButton(text = day)
+                dropButton.command = self.changeDay
+
+                content_box.add_widget(dropButton)
+            self.days_dropdown_list.add_widget(content_box)
 
             self.isUsedAlready = True
 
@@ -289,8 +306,12 @@ class FacultyScreen(Screen) :
     current_screen: str = StringProperty("")
     list_of_screens: dict[str, TeachersScreen] = DictProperty({})
 
+    exit_command : callable = ObjectProperty() # Use to exit the screen
+
     def on_pre_enter(self, *args) :
         if self.parent :
+
+            self.exit_command = self.parent.switchScreenByName
 
             if not self.parent.parent.hasData() :  # Check if MainWindow hold the data already
                 self.parent.parent.loadScreenData()
@@ -427,23 +448,27 @@ class LocationScreenInformation(Screen) :
 
     def updateOnlyTeacherScreen(self) :
         # TODO: Update the screen if it TEACHER Screen
-        current_time = datetime.now()
-        if self.parent and self.screen_id and not self.isRoom :
-            for name, time_start, time_end in self.teacher_time :
-                if time_start.hour <= current_time.hour <= time_end.hour :  # Check if the current hour in the hour range
-                    if time_start.minute <= current_time.minute :  # Check if the current minute in the minute range
-                        # TODO: Set new location screen for teacher
-                        room_data = self.parent.parent.parent.parent.getSpecificRoom(name)
-                        self.image2.locationImage.source = room_data["building picture"]
-                        self.image2.locationName.text = room_data["name"]
-                        self.directions.info.text = room_data["directions"][0]
-                        break
-            else :
-                # TODO: Set new location screen for teacher if no specified room
-                room_data = self.parent.parent.parent.parent.getSpecificRoom(self.ifNoTimeSpecifiedUseThisKey)
-                self.image2.locationImage.source = room_data["building picture"]
-                self.image2.locationName.text = room_data["name"]
-                self.directions.info.text = room_data["directions"][0]
+        try:
+            current_time = datetime.now()
+            if self.parent and self.screen_id and not self.isRoom :
+                for name, time_start, time_end in self.teacher_time :
+                    if time_start.hour <= current_time.hour <= time_end.hour :  # Check if the current hour in the hour range
+                        if time_start.minute <= current_time.minute :  # Check if the current minute in the minute range
+                            # TODO: Set new location screen for teacher
+                            room_data = self.parent.parent.parent.parent.getSpecificRoom(name)
+                            self.image2.locationImage.source = room_data["building picture"]
+                            self.image2.locationName.text = room_data["name"]
+                            self.directions.info.text = room_data["directions"][0]
+                            break
+                else :
+                    # TODO: Set new location screen for teacher if no specified room
+                    room_data = self.parent.parent.parent.parent.getSpecificRoom(self.ifNoTimeSpecifiedUseThisKey)
+                    self.image2.locationImage.source = room_data["building picture"]
+                    self.image2.locationName.text = room_data["name"]
+                    self.directions.info.text = room_data["directions"][0]
+
+        except AttributeError: # I put this to handle error when changing screen
+            pass
 
     def updateScreen(self, data: dict, isRoom: bool, key: str) :
         self.__data = data
@@ -477,8 +502,9 @@ class GuestScreen(Screen) :
     __okey_to_animate = True
     __changing_speed = 5
 
-    def on_kv_post(self, base_widget) :
-        Clock.schedule_interval(self.update_activity, 1 / 30)
+    index_of_screen : int = NumericProperty(0)
+    main_event : Clock = None
+    changing_screen_event : Clock = None
 
     def update_activity(self, interval: float) :
         if self.parent :
@@ -496,42 +522,54 @@ class GuestScreen(Screen) :
         self.__okey_to_animate = True
 
     def on_enter(self, *args) :
-        if self.parent :
-            self.parent.parent.loadScreenData()
 
-            instructor_data = self.parent.parent.getInstructorData()
-            for name in instructor_data :
-                self.screens_names.append(name)
-                location = LocationScreenInformation(name=name)
-                location.updateScreen(instructor_data[name], False, name)
-                self.screens_handler.add_widget(location)
+        self.main_event = Clock.schedule_interval(self.update_activity, 1 / 30)
 
-            room_data = self.parent.parent.getRoomData()
-            for name in room_data :
-                self.screens_names.append(name)
-                location = LocationScreenInformation(name=name)
-                location.updateScreen(room_data[name], True, name)
-                self.screens_handler.add_widget(location)
+        try:
+            if self.parent :
 
-        self.animateChangingScreens()
+                self.parent.parent.loadScreenData()
 
-    def animateChangingScreens(self) :
+                instructor_data = self.parent.parent.getInstructorData()
+                for name in instructor_data :
+                    self.screens_names.append(name)
+                    location = LocationScreenInformation(name=name)
+                    location.updateScreen(instructor_data[name], False, name)
+                    self.screens_handler.add_widget(location)
 
-        def animate(pos: int) :
-            if self.__okey_to_animate :
-                self.screens_handler.current = self.screens_names[pos]
-                Clock.schedule_once(lambda x : animate(pos + 1 if pos + 1 < len(self.screens_names) else 0),
-                                    self.__changing_speed)
-            else :
-                Clock.schedule_once(lambda x : animate(pos), 1 / 30)
+                room_data = self.parent.parent.getRoomData()
+                for name in room_data :
+                    self.screens_names.append(name)
+                    location = LocationScreenInformation(name=name)
+                    location.updateScreen(room_data[name], True, name)
+                    self.screens_handler.add_widget(location)
 
-        Clock.schedule_once(lambda x : animate(0), self.__changing_speed)
+            self.animateChangingScreens()
+
+        except AttributeError :  # I put this to handle error when changing screen
+            pass
+
+    def animate(self , *args):
+        self.index_of_screen = self.index_of_screen + 1 if (self.index_of_screen + 1) < len(self.screens_names) else 0
+        self.screens_handler.current = self.screens_names[self.index_of_screen]
+        self.changing_screen_event =Clock.schedule_once(self.animateChangingScreens , self.__changing_speed)
+
+    def animateChangingScreens(self , *args) :
+        if self.__okey_to_animate :
+            self.changing_screen_event = Clock.schedule_once(self.animate, self.__changing_speed)
+        else :
+            self.changing_screen_event = Clock.schedule_once(self.animateChangingScreens , 1 / 30)
 
     def controlVariables(self, okey_to_animate=None, changing_speed=None) :
         if okey_to_animate is not None :
             self.__okey_to_animate = okey_to_animate
         if changing_speed is not None :
             self.__changing_speed = changing_speed
+
+    def on_leave(self, *args):
+        self.__okey_to_animate = False
+        Clock.unschedule(self.main_event)
+        Clock.unschedule(self.changing_screen_event)
 
 
 # ------------------------ Developer Screens ----------------------

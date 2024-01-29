@@ -6,7 +6,10 @@
     orientation : 'vertical'
     locationName : locationName
     locationImage : locationImage
-    spacing : min(self.size) * 0.03
+    on_parent:
+        self.spacing = min(self.size) * 0.03
+    on_size:
+        self.spacing = min(self.size) * 0.03
 
     BoxLayout :
         size_hint : 1 , 0.8
@@ -30,8 +33,11 @@
         size_hint : 1 , 0.2
         text : "ROOM 501"
         font_name : 'title_font'
-        font_size : ( min(self.size) * 0.67 ) - ( len(self.text) * 0.4) if len(self.text) > 10 else (min(self.size) * 0.5 )
         color : chex('f0f3f4')
+        on_parent:
+            self.font_size = ( min(self.size) * 0.67 ) - ( len(self.text) * 0.4) if len(self.text) > 10 else (min(self.size) * 0.5 )
+        on_size:
+            self.font_size = ( min(self.size) * 0.67 ) - ( len(self.text) * 0.4) if len(self.text) > 10 else (min(self.size) * 0.5 )
 
 
 <LocationInformationContainer>:
@@ -52,11 +58,14 @@
     Label:
         id : title
         size_hint : 1 , None
-        height: self.texture_size[1] + ( min(root.size)  * 0.1 )
-		font_size : min(root.size) * 0.1
         text : "DIRECTIONS"
         font_name : "title_font"
         color : chex("620609")
+        height : self.texture_size[1] + ( min(root.size)  * 0.1 )
+
+        on_size:
+            self.height = self.texture_size[1] + ( min(root.size)  * 0.1 )
+            self.font_size = min(root.size) * 0.1
 
         canvas.before:
             Color:
@@ -80,7 +89,10 @@
                 text_size: self.width, None
                 color : chex("620609")
                 markup : True
-                font_size : min(root.size) * 0.07
+                on_parent:
+                    self.font_size = min(root.size) * 0.07
+                on_size:
+                    self.font_size = min(root.size) * 0.07
 
 
 
@@ -105,7 +117,10 @@
             orientation : 'vertical'
             pos_hint : { "x" : 0.08 , "center_y" : 0.5 }
             size_hint : 0.5 , 0.92
-            spacing : min(self.size) * 0.04
+            on_parent:
+                spacing = min(self.size) * 0.04
+            on_size:
+                spacing = min(self.size) * 0.04
 
             LocationImageContainer:
                 id : image1
@@ -143,12 +158,18 @@
     height : 44
     md_bg_color : chex("620609")
     font_name : "ai_font"
-    font_size : ( min(self.size) * 0.5 ) - ( len(self.text) * 0.1) if len(self.text) > 10 else (min(self.size) * 0.5 )
+    on_parent:
+        self.font_size = ( min(self.size) * 0.5 ) - ( len(self.text) * 0.1) if len(self.text) > 10 else (min(self.size) * 0.5 )
+    on_size:
+        self.font_size = ( min(self.size) * 0.5 ) - ( len(self.text) * 0.1) if len(self.text) > 10 else (min(self.size) * 0.5 )
+
 
 
 <FacultyWarningActionsModalView>:
     background_color : 0 , 0 , 0, 0
     overlay_color : 0, 0, 0, 0
+
+    text_displayer : text_displayer
 
     canvas.before:
         Color:
@@ -162,8 +183,8 @@
         size_hint : 0.5, 0.6
         pos_hint : { 'center_x' : 0.5 , 'center_y' : 0.5 }
         orientation : 'vertical'
-        padding : min(self.size) * 0.05
-        spacing : min(self.size) * 0.01
+        padding : [ dp(20) , dp(40) , dp(20) , dp(40) ]
+        spacing : dp(1)
 
         canvas.before:
             Color :
@@ -181,32 +202,43 @@
                 cols : 1
 
                 Label:
-                    text : "A" * 670
+                    id : text_displayer
                     size_hint : 1, None
                     text_size: self.width - dp(20), None
                     height : self.texture_size[1]
-                    font_size : min(root.size) * 0.04
                     color : chex('7f0f0f')
+
+                    on_parent:
+                        self.font_size = min(root.size) * 0.04
+                    on_size:
+                        self.font_size = min(root.size) * 0.04
 
         BoxLayout:
             size_hint : 1 , 0.2
-            padding : min(self.size) * 0.2
-            spacing : min(self.size) * 0.3
+
+            on_parent:
+                self.padding = min(self.size) * 0.2
+                self.spacing = min(self.size) * 0.3
+
+            on_size:
+                self.padding = min(self.size) * 0.2
+                self.spacing = min(self.size) * 0.3
 
             ChangeFacultyInfoModalViewButtonUpdate:
                 opacity : 0 if root.isUsedToDisplay else 1
-                disabled : not root.isUsedToDisplay
+                disabled : root.isUsedToDisplay
 
                 on_release:
-                    None if not root.isUsedToDisplay else None
+                    root.command() if not root.isUsedToDisplay else None
 
 
             ChangeFacultyInfoModalViewButtonCancel:
-                opacity : 0 if root.isUsedToDisplay else 1
-                disabled : not root.isUsedToDisplay
+                opacity : 1
+                text : root.cancelText
 
                 on_release:
-                    root.dismiss() if not root.isUsedToDisplay else None
+                    root.dismiss()
+                    root.cancelText = "CANCEL"
 
 
 <AddFacultyScheduleModalView>:
@@ -214,6 +246,7 @@
     overlay_color : 0, 0, 0, 0
 
     location_dropdown : location_dropdown
+    day_selection : day_selection
 
     canvas.before:
         Color:
@@ -227,8 +260,14 @@
         size_hint : 0.5, 0.6
         pos_hint : { 'center_x' : 0.5 , 'center_y' : 0.5 }
         orientation : 'vertical'
-        padding : min(self.size) * 0.05
-        spacing : min(self.size) * 0.01
+
+        on_parent:
+            self.padding = min(self.size) * 0.05
+            self.spacing = min(self.size) * 0.01
+
+        on_size:
+            self.padding = min(self.size) * 0.05
+            self.spacing = min(self.size) * 0.01
 
         canvas.before:
             Color :
@@ -240,32 +279,48 @@
 
         BoxLayout:
             size_hint : 1 , 0.15
-            padding : ( min(self.size) * 0.3 , 0 , min(self.size) * 0.3 , 0 )
+
+            on_parent:
+                self.padding = ( min(self.size) * 0.3 , 0 , min(self.size) * 0.3 , 0 )
+            on_size:
+                self.padding = ( min(self.size) * 0.3 , 0 , min(self.size) * 0.3 , 0 )
 
             Label:
                 text : "L O C A T I O N :"
                 font_name : "title_font"
-                font_size : min(self.size) * 0.45
                 size_hint : 0.4 ,1
                 color : "black"
 
+                on_parent:
+                    self.font_size = min(self.size) * 0.45
+                on_size:
+                    self.font_size = min(self.size) * 0.45
+
+
+        # -------> Location Picker
             MDFillRoundFlatButton :
                 id : location_dropdown
                 size_hint : 0.6 , 0.9
                 md_bg_color : chex('7f0f0f')
                 text : "Select Location"
-                font_size : ( min(self.size) * 0.5 ) - ( len(self.text) * 0.3) if len(self.text) > 10 else (min(self.size) * 0.5 )
                 font_name : "title_font"
+
+                on_parent:
+                    self.font_size = ( min(self.size) * 0.5 ) - ( len(self.text) * 0.3) if len(self.text) > 10 else (min(self.size) * 0.5 )
+                on_size:
+                    self.font_size = ( min(self.size) * 0.5 ) - ( len(self.text) * 0.3) if len(self.text) > 10 else (min(self.size) * 0.5 )
 
                 on_release:
                     root.dropdown_list.open(*args)
 
+
+        # -------> Time Picker
         BoxLayout:
-            size_hint : 1 , 0.6
+            size_hint : 1 , 0.4
             orientation : 'vertical'
 
             BoxLayout:
-                size_hint : 1 , 0.5
+                size_hint : 1 , 0.6
 
                 AddFacultyScheduleModalViewLabel:
                     text : "START TIME"
@@ -274,37 +329,64 @@
                     text : "END TIME"
 
             BoxLayout:
-                size_hint : 1 , 0.2
+                size_hint : 1 , 0.4
                 padding : [ dp(20) , dp(0) , dp(20) , dp(0) ]
                 spacing : dp(30)
 
                 FacultyTimePickerButton:
                     text : root.time_start
                     size_hint : 0.5 , 1
-                    font_size : min(root.size) * 0.03
+                    text : root.start_time
+
                     on_release:
                         root.time_selections.start_time_picker.open()
 
                 FacultyTimePickerButton:
                     text : root.time_start
                     size_hint : 0.5 , 1
-                    font_size : min(root.size) * 0.03
+                    text : root.end_time
+
                     on_release:
                         root.time_selections.end_time_picker.open()
 
-            Widget :
-                size_hint : 1 , 0.3
+        # -------> Day Picker
+        FloatLayout :
+            size_hint : 1 , 0.2
 
+            MDFillRoundFlatButton:
+                id : day_selection
+                pos_hint : { 'center_x' : 0.5 , 'center_y' : 0.5 }
+                size_hint : 0.5 , 0.7
+                md_bg_color : chex('7f0f0f')
+                text : "Select Day"
+                font_name : "title_font"
+
+                on_parent:
+                    self.font_size = ( min(self.size) * 0.5 ) - ( len(self.text) * 0.3) if len(self.text) > 10 else (min(self.size) * 0.5 )
+                on_size:
+                    self.font_size = ( min(self.size) * 0.5 ) - ( len(self.text) * 0.3) if len(self.text) > 10 else (min(self.size) * 0.5 )
+
+                on_release:
+                    root.days_dropdown_list.open(*args)
+
+        # -------> Adding Button and Cancel Button
         BoxLayout:
             size_hint : 1 , 0.2
-            padding : min(self.size) * 0.2
-            spacing : min(self.size) * 0.3
+
+            on_parent :
+                self.padding = min(self.size) * 0.2
+                self.spacing = min(self.size) * 0.3
+            on_size :
+                self.padding = min(self.size) * 0.2
+                self.spacing = min(self.size) * 0.3
 
             ChangeFacultyInfoModalViewButtonUpdate:
+                on_release:
+                    root.updatingNewSchedule()
 
             ChangeFacultyInfoModalViewButtonCancel:
                 on_release:
-                    root.dismiss()
+                    root.closeModal()
 
 
 <ChangeFacultyInfoModalView>:
@@ -326,8 +408,13 @@
         size_hint : 0.5, 0.6
         pos_hint : { 'center_x' : 0.5 , 'center_y' : 0.5 }
         orientation : 'vertical'
-        padding : min(self.size) * 0.05
-        spacing : min(self.size) * 0.01
+
+        on_parent :
+            self.padding = min(self.size) * 0.05
+            self.spacing = min(self.size) * 0.01
+        on_size :
+            self.padding = min(self.size) * 0.05
+            self.spacing = min(self.size) * 0.01
 
         canvas.before:
             Color :
@@ -343,13 +430,19 @@
             Label:
                 text : "N A M E :"
                 font_name : "title_font"
-                font_size : min(self.size) * 0.4
                 size_hint : 0.3 ,1
                 color : "black"
+                on_size:
+                    self.font_size = min(self.size) * 0.4
+                on_parent:
+                    self.font_size = min(self.size) * 0.4
 
             BoxLayout :
                 size_hint : 0.7 , 1
-                padding : min(self.size) * 0.1
+                on_parent:
+                    self.padding = min(self.size) * 0.1
+                on_size:
+                    self.padding = min(self.size) * 0.1
                 canvas.before:
                     Color:
                         rgba: chex('7f0f0f')
@@ -366,8 +459,12 @@
                     foreground_color : chex('f0f3f4')
                     multiline : False
                     font_name : "content_font"
-                    font_size : min(self.size) * 0.52
                     valign : "center"
+
+                    on_size:
+                        self.font_size = min(self.size) * 0.52
+                    on_parent:
+                        self.font_size = min(self.size) * 0.52
 
 
         BoxLayout:
@@ -377,14 +474,20 @@
             Label:
                 text : "I N F O R M A T I O N : "
                 font_name : "title_font"
-                font_size : min(self.size) * 0.4
                 size_hint : 1 , 0.3
                 color : "black"
                 text_size: self.width, None
+                on_parent:
+                    self.font_size = min(self.size) * 0.4
+                on_size:
+                    self.font_size = min(self.size) * 0.4
 
             BoxLayout :
                 size_hint : 1 , 0.7
-                padding : min(self.size) * 0.1
+                on_parent:
+                    self.padding = min(self.size) * 0.1
+                on_size:
+                    self.padding = min(self.size) * 0.1
                 canvas.before:
                     Color:
                         rgba: chex('7f0f0f')
@@ -401,15 +504,22 @@
                     foreground_color : chex('f0f3f4')
                     multiline : True
                     font_name : "content_font"
-                    font_size : min(self.size) * 0.15
                     valign : "center"
+                    on_parent:
+                        self.font_size = min(self.size) * 0.15
+                    on_size:
+                        self.font_size = min(self.size) * 0.15
 
 
 
         BoxLayout:
             size_hint : 1 , 0.2
-            padding : min(self.size) * 0.2
-            spacing : min(self.size) * 0.3
+            on_parent:
+                self.padding = min(self.size) * 0.2
+                self.spacing = min(self.size) * 0.3
+            on_size:
+                self.padding = min(self.size) * 0.2
+                self.spacing = min(self.size) * 0.3
 
             ChangeFacultyInfoModalViewButtonUpdate:
                 on_release:
@@ -422,62 +532,86 @@
 
 <ScheduleContainer>:
     size_hint : 1, None
-    height : self.width * 0.07
+    on_size:
+        self.height = self.width * 0.07
+    on_parent:
+        self.height = self.width * 0.07
+
     canvas.before:
         Color:
             rgba : chex("f0f3f4")
         RoundedRectangle:
             pos: self.pos
             size : self.size
-            radius : ( min(self.size) * 0.01, )
+            radius : ( 1, )
 
     Label:
         size_hint : None , 1
-        width : root.size[0] / len(root.children)
         text : root.room
         font_name : "content_font"
-        font_size : min(self.size) * 0.5
         color : chex("620609")
+        on_parent:
+            self.width = root.size[0] / len(root.children)
+            self.font_size = min(self.size) * 0.35
+        on_size:
+            self.width = root.size[0] / len(root.children)
+            self.font_size = min(self.size) * 0.35
 
     Label:
         size_hint : None , 1
-        width : root.size[0] / len(root.children)
+        text : "MONDAY"
+        font_name : "content_font"
+        color : chex("620609")
+        on_parent:
+            self.width = root.size[0] / len(root.children)
+            self.font_size = min(self.size) * 0.35
+        on_size:
+            self.width = root.size[0] / len(root.children)
+            self.font_size = min(self.size) * 0.35
+
+    Label:
+        size_hint : None , 1
         text : root.schedule
         font_name : "content_font"
-        font_size : min(self.size) * 0.5
         color : chex("620609")
+
+        on_parent:
+            self.width = root.size[0] / len(root.children)
+            self.font_size = min(self.size) * 0.36
+        on_size:
+            self.width = root.size[0] / len(root.children)
+            self.font_size = min(self.size) * 0.36
+
 
     BoxLayout:
         size_hint : None , 1
-        width : root.size[0] / len(root.children)
-        spacing : min(self.size) * 0.2
-        padding : min(self.size) * 0.1
+        on_parent:
+            self.width = root.size[0] / len(root.children)
+            self.spacing = min(self.size) * 0.2
+            self.padding = min(self.size) * 0.1
+        on_size:
+            self.width = root.size[0] / len(root.children)
+            self.spacing = min(self.size) * 0.2
+            self.padding = min(self.size) * 0.1
 
         Widget:
-            size_hint : 0.2 , 1
-
-        MDIconButton:
-            icon : "update"
-            font_size : min(self.parent.size) * 0.5
-            size_hint : 0.3 , 1
-            theme_icon_color: "Custom"
-            icon_color: chex('0da42e')
-
-        Widget:
-            size_hint : 0.2 , 1
+            size_hint : 0.35 , 1
 
         MDIconButton:
             icon : "delete-forever"
-            font_size : min(self.parent.size) * 0.5
             size_hint : 0.3 , 1
             theme_icon_color: "Custom"
             icon_color: chex('bf090f')
+            on_parent:
+                self.font_size = min(self.parent.size) * 0.5
+            on_size:
+                self.font_size = min(self.parent.size) * 0.5
 
             on_release:
                 root.deleteSchedule(root.parent_index)
 
         Widget:
-            size_hint : 0.2 , 1
+            size_hint : 0.35 , 1
 
 
 <TeachersScreen>:
@@ -511,9 +645,14 @@
             pos_hint : { "top" : 0.92 , "x" : 0.38 }
             text : "Ericson Mark A. Guanzon"
             font_name : "title_font"
-            text_size: self.width - dp(20), None
-            height : self.texture_size[1]
-            font_size : ( min(self.size) * 0.67 ) - ( len(self.text) * 0.43) if len(self.text) > 10 else (min(self.size) * 0.5 )
+            height:self.texture_size[1]
+
+            on_parent:
+                self.text_size = self.width - dp(20), None
+                self.font_size = ( min(self.size) * 0.67 ) - ( len(self.text) * 0.43) if len(self.text) > 10 else (min(self.size) * 0.5 )
+            on_size:
+                self.text_size = self.width - dp(20), None
+                self.font_size = ( min(self.size) * 0.67 ) - ( len(self.text) * 0.43) if len(self.text) > 10 else (min(self.size) * 0.5 )
 
             canvas.before:
                 Color:
@@ -544,6 +683,7 @@
                 FacultyScreenLabelForInformation:
                     id : teacher_info
 
+
         #Teacher Schedule Time
         BoxLayout:
             orientation : 'vertical'
@@ -560,14 +700,13 @@
                 size_hint : 1,  0.15
 
             ScrollView:
-                size_hint : 1,  0.85
 
                 MDGridLayout:
                     id : teacher_schedule
                     adaptive_height : True
                     cols : 1
-                    spacing : min(self.parent.size) * 0.02
-                    padding : min(self.size) * 0.1
+                    spacing : dp(5)
+                    padding : dp(5)
 
 
         # Teacher Activity
@@ -587,7 +726,6 @@
                 size_hint : 1 , 0.25
                 text : "ACTIVITY"
                 color : chex("7f0f0f")
-                font_size : min(self.size) * 0.5
                 font_name : "title_font"
                 canvas.before:
                     Color:
@@ -596,12 +734,18 @@
                         pos : self.pos
                         size : self.size
                         radius : ( min(self.parent.size) * 0.05, )
+                on_size:
+                    self.font_size = min(self.size) * 0.5
 
             BoxLayout:
                 orientation : 'vertical'
                 size_hint: 1 , 0.75
-                padding :  min(self.size) * 0.1
-                spacing : min(self.size) * 0.03
+                on_parent:
+                    self.padding =  min(self.size) * 0.05
+                    self.spacing = min(self.size) * 0.025
+                on_size:
+                    self.padding =  min(self.size) * 0.05
+                    self.spacing = min(self.size) * 0.025
 
                 FacultyScreenActivityButton:
                     text : "Change Info"
@@ -628,19 +772,25 @@
                     color : chex('bf090f')
 
                     on_release :
+                        #root.parent.parent.parent.exit_command('guest') # Testing Only To Change Screen
                         root.resetSchedule()
                         root.warning.open()
 
 
 <NavigationButton>:
-    font_size : ( min(self.size) * 0.67 ) - ( len(self.text) * 0.43) if len(self.text) > 10 else (min(self.size) * 0.5 )
     font_name : "content_font"
     background_down : ""
     background_color : 0, 0 , 0, 0
     size_hint : 1 , None
-    height : min(self.parent.parent.size) * 0.15 if self.parent else dp(100)
     font_name : "title_font" if self.isSelected else "content_font"
     color : self.activity_colors['selected'][1] if self.isSelected else self.activity_colors['unselected'][1]
+    on_parent:
+        self.font_size = ( min(self.size) * 0.67 ) - ( len(self.text) * 0.43) if len(self.text) > 10 else (min(self.size) * 0.5 )
+        self.height = min(self.parent.parent.size) * 0.15 if self.parent else dp(100)
+    on_size:
+        self.font_size = ( min(self.size) * 0.67 ) - ( len(self.text) * 0.43) if len(self.text) > 10 else (min(self.size) * 0.5 )
+        self.height = min(self.parent.parent.size) * 0.15
+
 
     canvas.before:
         Color:
@@ -652,6 +802,7 @@
 
     on_release:
         self.command()
+
 
 <FacultyScreen>:
 
@@ -713,8 +864,10 @@
     background_color : 0 , 0, 0, 0
     background_down : ""
     font_name : "content_font"
-    font_size : min(self.size) * 0.5
-    text : "12:00"
+    on_parent:
+        self.font_size = min(self.size) * 0.5
+    on_size:
+        self.font_size = min(self.size) * 0.5
 
     canvas.before:
         Color :
@@ -725,16 +878,23 @@
             radius : ( min( self.size) * 0.5 ,)
 
 <AddFacultyScheduleModalViewLabel@Label>:
-    font_size: min(self.size) * 0.3
     font_name : "title_font"
     color : "black"
+    on_parent:
+        self.font_size = min(self.size) * 0.3
+    on_size:
+        self.font_size = min(self.size) * 0.3
+
 
 <ChangeFacultyInfoModalViewButtonCancel@Button>:
     background_color : 0 , 0, 0, 0
     background_down : ""
     font_name : "title_font"
-    font_size : min(self.size) * 0.5
     text : "CANCEL"
+    on_parent:
+        self.font_size = min(self.size) * 0.5
+    on_size:
+        self.font_size = min(self.size) * 0.5
 
     canvas.before:
         Color :
@@ -744,12 +904,16 @@
             size : self.size
             radius : ( min( self.size) * 0.5 ,)
 
+
 <ChangeFacultyInfoModalViewButtonUpdate@Button>:
     background_color : 0 , 0, 0, 0
     background_down : ""
     font_name : "title_font"
-    font_size : min(self.size) * 0.5
     text : "UPDATE"
+    on_parent:
+        self.font_size = min(self.size) * 0.5
+    on_size:
+        self.font_size = min(self.size) * 0.5
 
     canvas.before:
         Color :
@@ -759,11 +923,15 @@
             size : self.size
             radius : ( min( self.size) * 0.5 ,)
 
+
 <FacultyScreenActivityButton@Button>:
     background_color : 0 , 0, 0, 0
     background_down : ""
     font_name : "title_font"
-    font_size : min(self.size) * 0.5
+    on_parent:
+        self.font_size = min(self.size) * 0.5
+    on_size:
+        self.font_size = min(self.size) * 0.5
 
     canvas.before:
         Color :
@@ -783,26 +951,47 @@
             size : self.size
 
     Label:
-        size_hint : None , 1
-        width : root.size[0] / len(root.children)
+        size_hint : 0.25 , 1
         text : "LOCATION"
         font_name : "title_font"
-        font_size : min(self.size) * 0.5
         color : chex("620609")
+        on_parent:
+            self.font_size = min(self.size) * 0.5
+            width : root.size[0] / len(root.children)
+        on_size:
+            self.font_size = min(self.size) * 0.5
+
     Label:
-        size_hint : None , 1
-        width : root.size[0] / len(root.children)
+        size_hint : 0.25 , 1
+        text : "DAY"
+        font_name : "title_font"
+        color : chex("620609")
+        on_parent:
+            self.font_size = min(self.size) * 0.5
+            width : root.size[0] / len(root.children)
+        on_size:
+            self.font_size = min(self.size) * 0.5
+
+    Label:
+        size_hint : 0.25 , 1
         text : "TIME - TIME"
         font_name : "title_font"
-        font_size : min(self.size) * 0.5
         color : chex("620609")
+        on_parent:
+            self.font_size = min(self.size) * 0.5
+        on_size:
+            self.font_size = min(self.size) * 0.5
+
     Label:
-        size_hint : None , 1
-        width : root.size[0] / len(root.children)
+        size_hint : 0.25 , 1
         text : "ACTIONS"
         font_name : "title_font"
-        font_size : min(self.size) * 0.5
         color : chex("620609")
+        on_parent:
+            self.font_size = min(self.size) * 0.5
+            width : root.size[0] / len(root.children)
+        on_size:
+            self.font_size = min(self.size) * 0.5
 
 
 
@@ -810,16 +999,23 @@
     size_hint : 1, None
     text : "Ericson Mark A. Guanzon"
     font_name : "content_font"
-    text_size: self.width - dp(20), None
     height : self.texture_size[1]
-    font_size : min(self.parent.parent.size) * 0.13
+    on_parent:
+        self.font_size = min(self.parent.parent.size) * 0.13
+        self.text_size = self.width - dp(20), None
+    on_size:
+        self.font_size = min(self.parent.parent.size) * 0.13
+        self.text_size = self.width - dp(20), None
 
 
 <FacultyScreenTitleNav@Label>:
     text: "TEACHERS"
     font_name : "title_font"
     color : chex("620609")
-    font_size : min(self.size) * 0.5
+    on_parent:
+        self.font_size = min(self.size) * 0.5
+    on_size:
+        self.font_size = min(self.size) * 0.5
     canvas.before:
         Color:
             rgba : chex('DABBBB')
@@ -827,6 +1023,7 @@
             pos : self.pos
             size : self.size
             radius : ( min(self.size) * 0.4, )
+
 
 <FacultySelectionLocationDropdownContent>:
     orientation : 'vertical'
@@ -840,3 +1037,7 @@
     md_bg_color : chex("620609")
     font_name : "title_font"
     text : "Select Time"
+    on_parent:
+        self.font_size = min(self.parent.size) * 0.4
+    on_size:
+        self.font_size = min(self.parent.size) * 0.4

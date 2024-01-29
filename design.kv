@@ -56,11 +56,128 @@ MainWindow:
         pos_hint: { 'x' : 0.02 , 'y': 0.02 }
 
 
+# ------------------- Login Viewer ------------
+<LogInView>:
+    background_color : 0 , 0 , 0, 0
+    overlay_color : 0 , 0 , 0, 0.3
+    auto_dismiss : False
+
+    username : username
+    password : password
+
+    BoxLayout:
+        size_hint : 0.5 , 0.5
+        pos_hint : { "center_x" : 0.5 , "center_y" : 0.5 }
+        orientation : 'vertical'
+        spacing : dp(10)
+
+        on_size:
+            self.padding = min(self.size) * 0.05
+
+        canvas.before:
+            Color :
+                rgba : chex('dabbbb')
+            RoundedRectangle:
+                pos : self.pos
+                size : self.size
+                radius : ( 24, )
+
+        LogInTitleLabel:
+            size_hint : 1, 0.2
+
+        LogInFormLabel:
+            size_hint : 1 , 0.1
+            text : "USERNAME :"
+        BoxLayout:
+            size_hint : 1 , 0.15
+            padding : [ dp(10) , dp(5) , dp(10) , dp(5) ]
+
+            TextInput:
+                id : username
+                size_hint : 1 , 1
+                hint_text: "Enter The Admin Username"
+                font_name : "ai_font"
+                foreground_color: chex("620609")
+                password : True
+                on_parent:
+                    self.font_size = min(self.size) * 0.52
+                on_size:
+                    self.font_size = min(self.size) * 0.52
+
+        LogInFormLabel:
+            size_hint : 1 , 0.1
+            text : "PASSWORD :"
+        BoxLayout:
+            size_hint : 1 , 0.15
+            padding : [ dp(10) , dp(5) , dp(10) , dp(5) ]
+
+            TextInput:
+                id : password
+                size_hint : 1 , 1
+                hint_text: "Enter The Admin Password"
+                font_name : "ai_font"
+                foreground_color: chex("620609")
+                password : True
+                on_parent:
+                    self.font_size = min(self.size) * 0.52
+                on_size:
+                    self.font_size = min(self.size) * 0.52
+
+
+        BoxLayout:
+            size_hint : 1, 0.3
+            padding : dp(10)
+            spacing : dp(10)
+
+            Label:
+                size_hint : 0.5 , 1
+                text : f"TIME OUT : {root.timer} second"
+                color : "black"
+                font_name : "title_font"
+
+                on_size:
+                    self.font_size = min(self.size) * 0.3
+
+            BoxLayout:
+                size_hint : 0.5 , 1
+                padding : dp(20)
+
+                ChangeFacultyInfoModalViewButtonUpdate:
+                    size_hint : 1 , 1
+                    text : "CHANGE SCREEN"
+
+                    on_release:
+                        root.command(username.text, password.text)
+
 
 # ------------------- Screen Holder ------------
 <ContentWindow>:
 
 # ------------------- Additional Widgets ----------
+<LogInFormLabel@Label>:
+    font_name : "content_font"
+    height : self.texture_size[1]
+    color : chex("620609")
+    on_parent:
+        self.font_size = min(self.size) * 0.55
+        self.text_size = self.width - dp(20), None
+    on_size:
+        self.font_size = min(self.size) * 0.55
+        self.text_size = self.width - dp(20), None
+
+<LogInTitleLabel@Label>:
+    text : "Enter the admin username and password !!"
+    font_name : "title_font"
+    height : self.texture_size[1]
+    color : chex("620609")
+    on_parent:
+        self.font_size = min(self.size) * 0.35
+        self.text_size = self.width - dp(20), None
+    on_size:
+        self.font_size = min(self.size) * 0.35
+        self.text_size = self.width - dp(20), None
+
+
 <BuildingPicture@EffectWidget>:
 	effects: ew.HorizontalBlurEffect(size=self.parent.size_effect), ew.VerticalBlurEffect(size=self.parent.size_effect)
 	picture : picture
