@@ -55,6 +55,13 @@ class FacultyWarningActionsModalView(ModalView) :
         self.command = command
         self.open()
 
+    def on_dismiss(self):
+        self.text_displayer.text = ""
+        self.text_displayer.halign = "center"
+        self.isUsedToDisplay = True
+        self.cancelText = "CLOSE"
+        self.command = ObjectProperty(None)
+
 
 class FacultySelectionLocationDropdownContent(MDBoxLayout) :
     pass
@@ -115,6 +122,12 @@ class AddFacultyScheduleModalView(ModalView) :
 
     holder: Screen = ObjectProperty(None)
 
+    numberOfUsed = 0
+
+    def on_kv_post(self, base_widget):
+        self.time_selections = AddFacultyScheduleModalViewTimeSelections()
+        self.time_selections.holder = self
+
     def changeLocation(self, location: str) :
         self.location_dropdown.text = location
         self.dropdown_list.dismiss()
@@ -138,6 +151,7 @@ class AddFacultyScheduleModalView(ModalView) :
                 day = self.day_selection.text
                 room_schedule = self.holder.parent.parent.parent.getKeyByRoomName(self.location_dropdown.text)
                 self.holder.addSchedule(schedule = schedule_json , day = day, room_schedule = room_schedule)
+                self.closeModal()
                 # self.holder.warning.command = None
 
             self.holder.warning.displayAddingSchedule(self.start_time, self.end_time, self.location_dropdown.text,
@@ -162,6 +176,7 @@ class AddFacultyScheduleModalView(ModalView) :
 
                 content_box.add_widget(dropButton)
 
+            self.dropdown_list.clear_widgets()
             self.dropdown_list.add_widget(content_box)
 
             content_box = FacultySelectionLocationDropdownContent()
@@ -170,12 +185,12 @@ class AddFacultyScheduleModalView(ModalView) :
                 dropButton.command = self.changeDay
 
                 content_box.add_widget(dropButton)
+
+            self.days_dropdown_list.clear_widgets()
             self.days_dropdown_list.add_widget(content_box)
+            print(f"Happen in {self.holder.teacher_key}")
 
             self.isUsedAlready = True
-
-            self.time_selections = AddFacultyScheduleModalViewTimeSelections()
-            self.time_selections.holder = self
 
 
 class ChangeFacultyInfoModalView(ModalView) :
@@ -231,8 +246,13 @@ class TeachersScreen(Screen) :
 
     days = ( "MONDAY" , "TUESDAY" , "WEDNESDAY" , "THURSDAY" , "FRIDAY" , "SATURDAY", "SUNDAY" )
 
-    def __init__(self, **kwargs) :
-        super(TeachersScreen, self).__init__(**kwargs)
+    change_faculty_info : ChangeFacultyInfoModalView = ObjectProperty()
+    add_schedule : AddFacultyScheduleModalView = ObjectProperty()
+    warning : FacultyWarningActionsModalView = ObjectProperty()
+
+    new_added_schedule : dict = DictProperty({})
+
+    def on_kv_post(self, base_widget):
         self.change_faculty_info = ChangeFacultyInfoModalView()
         self.add_schedule = AddFacultyScheduleModalView()
         self.warning = FacultyWarningActionsModalView()
@@ -252,7 +272,10 @@ class TeachersScreen(Screen) :
         for room in data['locations'] :
             for schedule_time in data['locations'][room] :
                 container = ScheduleContainer()
-                print(f"Selected {schedule_time}")
+                # print(f"Selected {schedule_time}")
+                if "/" not in schedule_time:
+                    print(schedule_time , room  )
+                    continue
                 schedule, day = schedule_time.split("/")
                 container.updateOnCreate(schedule_time, room, schedule , self.days[int(day)])
                 container.deleteSchedule = self.removeSchedule
@@ -278,10 +301,10 @@ class TeachersScreen(Screen) :
 
     def addSchedule(self, schedule: str, day : str, room_schedule: str) :
         data_info = f"{schedule}/{self.days.index(day)}"
-        if room_schedule in self.teacher_data["locations"]:
-            self.teacher_data["locations"][room_schedule].append(data_info)
+        if room_schedule in self.new_added_schedule:
+            self.new_added_schedule[room_schedule].append(data_info)
         else:
-            self.teacher_data["locations"][room_schedule] = [room_schedule,]
+            self.new_added_schedule[room_schedule] = [data_info,]
 
         container = ScheduleContainer()
         container.updateOnCreate(data_info, room_schedule, schedule, day)
@@ -289,6 +312,14 @@ class TeachersScreen(Screen) :
         self.teacher_schedule.add_widget(container)
         self.add_schedule.closeModal()
         self.warning.dismiss()
+
+    def applyChanges(self):
+        past_data = self.teacher_data["locations"]
+        self.teacher_data["person"] = self.teacher_name.text
+        self.teacher_data["information"] = self.teacher_info.text
+        self.teacher_data["locations"] = {key : self.new_added_schedule.get(key, []) + past_data.get(key, []) for key in set(self.new_added_schedule) | set(past_data)}
+        self.parent.parent.parent.applyChanges( self.teacher_key, self.teacher_data )
+        self.new_added_schedule.clear()
 
 
 class NavigationButton(Button) :
@@ -316,9 +347,15 @@ class FacultyScreen(Screen) :
     current_screen: str = StringProperty("")
     list_of_screens: dict[str, TeachersScreen] = DictProperty({})
 
-    exit_command : callable = ObjectProperty() # Use to exit the screen
+    exit_command : callable = ObjectProperty() # Use to exit the
 
-    def on_pre_enter(self, *args) :
+    def applyChanges(self , key : str , new_data : dict):
+        self.instructor_data[key] = new_data
+        folder , filename = self.parent.parent.instructor_filename
+        self.parent.parent.saveNewData(filename=filename , data=self.instructor_data , folder=folder)
+        self.update_navigation_content()
+
+    def on_enter(self, *args) :
         if self.parent :
 
             self.exit_command = self.parent.switchScreenByName
@@ -341,6 +378,7 @@ class FacultyScreen(Screen) :
 
                 # Creating Navigation Screen
                 screen = TeachersScreen()
+                screen.teacher_key = key
                 screen.updateDisplay(values)
                 self.list_of_screens[key] = screen
 
@@ -377,33 +415,6 @@ class FacultyScreen(Screen) :
         for nav_button in self.navigation_buttons.children :
             nav_button.text = self.instructor_data[nav_button.name]['person']
 
-    def update_instructor_data(self, instructor: str, name=None, information=None, locations=None) :
-        """
-        :param instructor: the key string for data structure
-        :param name: new name of the instructor
-        :param information: new information of the instructor
-        :param locations: new data for new locations; structure = { room : [ start time - end time, ... ] }
-        :return: None
-        """
-
-        instructor_data = self.instructor_data.get(instructor, None)
-
-        if not instructor_data :
-            print(f"[!] Instructor does not exist ; {instructor_data}")
-            return
-
-        if name :
-            instructor_data['person'] = name
-        if information :
-            instructor_data['information'] = information
-        if locations :
-            instructor_data['locations'] = locations
-
-        self.instructor_data[instructor] = instructor_data
-        filename, folder = self.parent.parent.instructor_filename()
-        self.parent.parent.saveNewData(filename=filename, data=self.instructor_data, folder=folder)
-
-        self.update_navigation_content()
 
 
 # ------------------------ Guest Screens ----------------------

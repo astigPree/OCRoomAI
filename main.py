@@ -105,10 +105,10 @@ class MainWindow(FloatLayout) :
 
     @staticmethod
     def saveNewData( filename : str, data : dict, folder = None , isBytes = False):
-        filepath = os.path.join(os.path.dirname(__file__), folder, filename) if folder else os.path.join(
+        filepath = os.path.join(os.path.dirname(__file__), filename, folder) if folder else os.path.join(
             os.path.dirname(__file__), filename)
         with open(filepath, 'wb' if isBytes else 'w') as file :
-            return json.dump(data, file) if not isBytes else pickle.dump(data, file)
+            return json.dump(data, file, indent=4) if not isBytes else pickle.dump(data, file)
 
     def loadScreenData(self) :
         # TODO: Load the teachers and rooms data
@@ -163,6 +163,8 @@ class MainWindow(FloatLayout) :
         self.login.dismiss()
 
     # ---------------------- WRITING DATA ------------------------------
+
+
     def updateNewCommand(self, command : str):
         self.__current_command = command
 
