@@ -81,6 +81,14 @@ class FacultyWarningActionsModalView(ModalView) :
         self.command = command
         self.open()
 
+    def displayApplyingChanges(self, command : callable ):
+        self.isUsedToDisplay = False
+        self.text_displayer.text = f"Do you want to save the new changes in this screen?"
+        self.text_displayer.halign = "left"
+        self.proceed_text = "APPLY CHANGES"
+        self.command = command
+        self.open()
+
 
 class FacultySelectionLocationDropdownContent(MDBoxLayout) :
     pass
@@ -288,6 +296,10 @@ class TeachersScreen(Screen) :
         self.teacher_image.source = data['picture']
         self.teacher_name.text = data['person']
 
+        # For debugging
+        if data['person'] == "Justine Aban" :
+            print(f"Aban Locations : {data['locations']}")
+
         self.teacher_schedule.clear_widgets()  # Clear the display widgets
         for room in data['locations'] :
             for schedule_time in data['locations'][room] :
@@ -300,14 +312,27 @@ class TeachersScreen(Screen) :
         # TODO: Update the schedule screen
         self.teacher_data = data
 
+    def isThereAnyChanges(self) -> bool:
+        if self.new_added_schedule:
+            return True
+        if self.removed_schedules:
+            return True
+        if self.teacher_data['person'] != self.teacher_name.text:
+            return True
+        if self.teacher_data['information'] != self.teacher_info.text:
+            return True
+
+        return False
+
     def removeSchedule(self, schedule_object : ScheduleContainer ) :
         json_schedule = schedule_object.json_schedule
         room_schedule = schedule_object.room_schedule
+
         if room_schedule in self.removed_schedules:
-            self.removed_schedules[room_schedule].append(room_schedule)
+            self.removed_schedules[room_schedule].append(json_schedule)
         else:
-            self.removed_schedules[room_schedule] = [room_schedule,]
-        self.teacher_data['locations'][room_schedule].remove(json_schedule)
+            self.removed_schedules[room_schedule] = [json_schedule,]
+
         self.teacher_schedule.remove_widget(widget=schedule_object)
 
     def updateNameAndInfo(self, name: str, info: str) :
@@ -322,6 +347,7 @@ class TeachersScreen(Screen) :
                 self.removed_schedules[key] = [item,]
         self.teacher_data['locations'] = {}
         self.teacher_schedule.clear_widgets()
+        self.warning.dismiss()
 
     def addSchedule(self, schedule: str, day : str, room_schedule: str) :
         data_info = f"{schedule}/{self.days.index(day)}"
@@ -338,12 +364,17 @@ class TeachersScreen(Screen) :
         self.warning.dismiss()
 
     def applyChanges(self):
-        past_data = self.teacher_data["locations"]
         self.teacher_data["person"] = self.teacher_name.text
         self.teacher_data["information"] = self.teacher_info.text
-        self.teacher_data["locations"] = {key : self.new_added_schedule.get(key, []) + past_data.get(key, []) for key in set(self.new_added_schedule) | set(past_data)}
-        self.parent.parent.parent.applyChanges( self.teacher_key, self.teacher_data )
+
+        for key, values in self.removed_schedules.items(): # Use to filter and remove the past value
+            self.teacher_data["locations"][key] = [value for value in self.teacher_data["locations"].get(key, []) if value not in values]
+        self.teacher_data["locations"] = {key : self.new_added_schedule.get(key, []) + self.teacher_data["locations"].get(key, []) for key in set(self.new_added_schedule) | set(self.teacher_data["locations"])}
+
         self.new_added_schedule.clear()
+        self.removed_schedules.clear()
+        self.parent.parent.parent.applyChanges( self.teacher_key, self.teacher_data )
+        self.warning.dismiss()
 
     def disregardActivities(self , changeCommand : callable, screen_name : str):
         def command():
@@ -354,10 +385,13 @@ class TeachersScreen(Screen) :
         self.warning.displayUnfinishedTransactionInTeacherScreen(command=command)
 
     def resetScheduleWarning(self):
-        def command():
-            self.resetSchedule()
-            self.warning.dismiss()
-        self.warning.displayResetScheduleWarning(command)
+        if self.teacher_schedule.children:
+            self.warning.displayResetScheduleWarning(self.resetSchedule)
+
+    def applyChangesWarning(self):
+        if self.isThereAnyChanges():
+            self.warning.displayApplyingChanges(self.applyChanges)
+
 
 class NavigationButton(Button) :
     activity: callable = ObjectProperty(None)
@@ -448,7 +482,7 @@ class FacultyScreen(Screen) :
 
     def changeScreen(self, name: str) :
         if self.navigation_screens.current_screen:
-            if self.navigation_screens.current_screen.removed_schedules or self.navigation_screens.current_screen.new_added_schedule:
+            if self.navigation_screens.current_screen.isThereAnyChanges() :
                 self.navigation_screens.current_screen.disregardActivities(self.changeScreen , name)
                 return
 
@@ -492,9 +526,10 @@ class LocationScreenInformation(Screen) :
     time_parser = datetime.strptime
     time_format = "%H:%M:%S"
     time_split_letter = "-"
+    time_day_splitter = "/"
     teacher_time: list[[str, datetime, datetime], ...] = ListProperty([])
 
-    # Data Structure teacher_time : [ (room, time_start , time_end ) , ]
+    # Data Structure teacher_time : [ (room, time_start , time_end, day ) , ]
 
     def on_kv_post(self, base_widget) :
         self.information.title.text = "INFORMATION"
@@ -519,14 +554,15 @@ class LocationScreenInformation(Screen) :
         try:
             current_time = datetime.now()
             if self.parent and self.screen_id and not self.isRoom :
-                for name, time_start, time_end in self.teacher_time :
-                    if time_start.hour <= current_time.hour <= time_end.hour :  # Check if the current hour in the hour range
-                        if time_start.minute <= current_time.minute :  # Check if the current minute in the minute range
-                            # TODO: Set new location screen for teacher
-                            room_data = self.parent.parent.parent.parent.getSpecificRoom(name)
-                            self.image2.locationImage.source = room_data["building picture"]
-                            self.image2.locationName.text = room_data["name"]
-                            self.directions.info.text = room_data["directions"][0]
+                for name, time_start, time_end, day in self.teacher_time :
+                    if current_time.weekday() == day: # Check if the current day is the saved day
+                        if time_start.hour <= current_time.hour <= time_end.hour :  # Check if the current hour in the hour range
+                            if time_start.minute <= current_time.minute :  # Check if the current minute in the minute range
+                                # TODO: Set new location screen for teacher
+                                room_data = self.parent.parent.parent.parent.getSpecificRoom(name)
+                                self.image2.locationImage.source = room_data["building picture"]
+                                self.image2.locationName.text = room_data["name"]
+                                self.directions.info.text = room_data["directions"][0]
                             break
                 else :
                     # TODO: Set new location screen for teacher if no specified room
@@ -557,10 +593,11 @@ class LocationScreenInformation(Screen) :
             self.information.info.text = data["information"]
             for location, overall_time in data["locations"].items() :
                 for time_in_room in overall_time :
+                    time_in_room, day = time_in_room.split(self.time_day_splitter)
                     time_start, time_end = time_in_room.split(self.time_split_letter)
                     time_start = self.time_parser(time_start, self.time_format)
                     time_end = self.time_parser(time_end, self.time_format)
-                    self.teacher_time.append((location, time_start, time_end))
+                    self.teacher_time.append((location, time_start, time_end , int(day)))
 
 
 class GuestScreen(Screen) :

@@ -50,7 +50,7 @@ class ContentWindow(ScreenManager) :
     listOfScreen = { 'guest' : GuestScreen , 'faculty' : FacultyScreen , 'dev' : DeveloperScreen}
 
     def on_parent(self, *args) :
-        screen = self.listOfScreen['faculty']()
+        screen = self.listOfScreen['guest']()
         self.switch_to(screen)
 
     def switchScreenByName(self, name : str):
