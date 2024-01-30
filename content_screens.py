@@ -134,8 +134,10 @@ class AddFacultyScheduleModalView(ModalView) :
             self.holder.warning.displayError("Please specify what day you want to stay-in for the time being")
         else :
             def command():
-                self.holder.addSchedule( f"{self.time_selections.time_start}-{self.time_selections.time_end}", self.location_dropdown.text)
-                print("Happen")
+                schedule_json =  f"{self.time_selections.time_start}-{self.time_selections.time_end}"
+                day = self.day_selection.text
+                room_schedule = self.holder.parent.parent.parent.getKeyByRoomName(self.location_dropdown.text)
+                self.holder.addSchedule(schedule = schedule_json , day = day, room_schedule = room_schedule)
                 # self.holder.warning.command = None
 
             self.holder.warning.displayAddingSchedule(self.start_time, self.end_time, self.location_dropdown.text,
@@ -163,7 +165,7 @@ class AddFacultyScheduleModalView(ModalView) :
             self.dropdown_list.add_widget(content_box)
 
             content_box = FacultySelectionLocationDropdownContent()
-            for day in ("MONDAY" , "TUESDAY" , "WENDSDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY" ):
+            for day in self.holder.days:
                 dropButton = FacultyDropDownButton(text = day)
                 dropButton.command = self.changeDay
 
@@ -194,17 +196,20 @@ class ChangeFacultyInfoModalView(ModalView) :
 
 
 class ScheduleContainer(BoxLayout) :
-    parent_index: int = NumericProperty(0)
     room: str = StringProperty('')
     schedule: str = StringProperty('')
+    day : str = StringProperty('')
 
     deleteSchedule: callable = ObjectProperty(None)
 
     json_schedule = ""
+    room_schedule = ""
 
-    def updateOnCreate(self, index: int, room: str, schedule: str ) :
-        self.parent_index = index
+    def updateOnCreate(self, data_info: str, room: str, schedule: str , day : str ) :
+        self.json_schedule = data_info
+        self.room_schedule = room
         self.room = room.upper()
+        self.day = day
 
         schedule_1, schedule_2 = schedule.split("-")
         schedule_1 = datetime.strptime(schedule_1, "%H:%M:%S")
@@ -213,7 +218,6 @@ class ScheduleContainer(BoxLayout) :
         schedule_2 = schedule_2.strftime("%I:%M %p")
 
         self.schedule = f"{schedule_1} - {schedule_2}"
-        self.json_schedule = schedule
 
 
 class TeachersScreen(Screen) :
@@ -224,6 +228,8 @@ class TeachersScreen(Screen) :
 
     teacher_data: dict = ObjectProperty(None)
     teacher_key: str = StringProperty("")
+
+    days = ( "MONDAY" , "TUESDAY" , "WEDNESDAY" , "THURSDAY" , "FRIDAY" , "SATURDAY", "SUNDAY" )
 
     def __init__(self, **kwargs) :
         super(TeachersScreen, self).__init__(**kwargs)
@@ -242,27 +248,25 @@ class TeachersScreen(Screen) :
         self.teacher_image.source = data['picture']
         self.teacher_name.text = data['person']
 
-        index = 0  # Used to identify the index in parent children
         self.teacher_schedule.clear_widgets()  # Clear the display widgets
         for room in data['locations'] :
             for schedule_time in data['locations'][room] :
                 container = ScheduleContainer()
-                container.updateOnCreate(index, room, schedule_time)
+                print(f"Selected {schedule_time}")
+                schedule, day = schedule_time.split("/")
+                container.updateOnCreate(schedule_time, room, schedule , self.days[int(day)])
                 container.deleteSchedule = self.removeSchedule
                 self.teacher_schedule.add_widget(container)
-                index += 1
 
         # TODO: Update the schedule screen
 
         self.teacher_data = data
 
-    def removeSchedule(self, index: int) :
-        for child in self.teacher_schedule.children:
-            if child.parent_index == index:
-                print(f"Schedule {child} , index : {index}")
-                print(self.parent.parent.parent)
-                self.teacher_data['locations'][''].remove(child.json_schedule)
-                self.teacher_schedule.remove_widget(widget=child)
+    def removeSchedule(self, schedule_object : ScheduleContainer ) :
+        json_schedule = schedule_object.json_schedule
+        room_schedule = schedule_object.room_schedule
+        self.teacher_data['locations'][room_schedule].remove(json_schedule)
+        self.teacher_schedule.remove_widget(widget=schedule_object)
 
     def updateNameAndInfo(self, name: str, info: str) :
         self.teacher_info.text = info if len(info) else self.teacher_info.text
@@ -272,9 +276,15 @@ class TeachersScreen(Screen) :
         self.teacher_data['locations'] = {}
         self.teacher_schedule.clear_widgets()
 
-    def addSchedule(self, schedule: str, room: str) :
+    def addSchedule(self, schedule: str, day : str, room_schedule: str) :
+        data_info = f"{schedule}/{self.days.index(day)}"
+        if room_schedule in self.teacher_data["locations"]:
+            self.teacher_data["locations"][room_schedule].append(data_info)
+        else:
+            self.teacher_data["locations"][room_schedule] = [room_schedule,]
+
         container = ScheduleContainer()
-        container.updateOnCreate(len(self.teacher_schedule.children), self.parent.parent.parent.getKeyByRoomName(room), schedule)
+        container.updateOnCreate(data_info, room_schedule, schedule, day)
         container.deleteSchedule = self.removeSchedule
         self.teacher_schedule.add_widget(container)
         self.add_schedule.closeModal()

@@ -50,7 +50,7 @@ class ContentWindow(ScreenManager) :
     listOfScreen = { 'guest' : GuestScreen , 'faculty' : FacultyScreen , 'dev' : DeveloperScreen}
 
     def on_parent(self, *args) :
-        screen = self.listOfScreen['guest']()
+        screen = self.listOfScreen['faculty']()
         self.switch_to(screen)
 
     def switchScreenByName(self, name : str):
@@ -231,4 +231,4 @@ if __name__ == "__main__" :
     try :
         RoomAIApp().run()
     except Exception as e:
-        print(f"Main Error : {e.with_traceback(None)}")
+        print(f"Main Error : {e.with_traceback(Exception)}")

@@ -559,7 +559,7 @@
 
     Label:
         size_hint : None , 1
-        text : "MONDAY"
+        text : root.day
         font_name : "content_font"
         color : chex("620609")
         on_parent:
@@ -608,7 +608,7 @@
                 self.font_size = min(self.parent.size) * 0.5
 
             on_release:
-                root.deleteSchedule(root.parent_index)
+                root.deleteSchedule(root)
 
         Widget:
             size_hint : 0.35 , 1
@@ -984,7 +984,7 @@
 
     Label:
         size_hint : 0.25 , 1
-        text : "ACTIONS"
+        text : "REMOVE"
         font_name : "title_font"
         color : chex("620609")
         on_parent:
