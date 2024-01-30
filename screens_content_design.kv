@@ -225,6 +225,7 @@
                 self.spacing = min(self.size) * 0.3
 
             ChangeFacultyInfoModalViewButtonUpdate:
+                text : root.proceed_text
                 opacity : 0 if root.isUsedToDisplay else 1
                 disabled : root.isUsedToDisplay
 
@@ -465,6 +466,8 @@
                         self.font_size = min(self.size) * 0.52
                     on_parent:
                         self.font_size = min(self.size) * 0.52
+                    on_text :
+                        self.text = self.text[:35] if len(self.text) > 35 else self.text
 
 
         BoxLayout:
@@ -774,8 +777,7 @@
 
                     on_release :
                         #root.parent.parent.parent.exit_command('guest') # Testing Only To Change Screen
-                        root.resetSchedule()
-                        root.warning.open()
+                        root.resetScheduleWarning()
 
 
 <NavigationButton>:
@@ -791,7 +793,8 @@
     on_size:
         self.font_size = ( min(self.size) * 0.67 ) - ( len(self.text) * 0.43) if len(self.text) > 10 else (min(self.size) * 0.5 )
         self.height = min(self.parent.parent.size) * 0.15
-
+    on_text:
+        self.font_size = ( min(self.size) * 0.67 ) - ( len(self.text) * 0.43) if len(self.text) > 10 else (min(self.size) * 0.5 )
 
     canvas.before:
         Color:

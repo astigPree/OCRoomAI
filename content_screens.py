@@ -36,6 +36,7 @@ class FacultyWarningActionsModalView(ModalView) :
 
     text_displayer: Label = ObjectProperty(None)
 
+    proceed_text : str = StringProperty("PROCCED")
     cancelText: str = StringProperty("CANCEL")
 
     command: callable = ObjectProperty(None)
@@ -48,10 +49,19 @@ class FacultyWarningActionsModalView(ModalView) :
         self.cancelText = "CLOSE"
         self.open()
 
-    def displayAddingSchedule(self, start_time: str, end_time: str, room: str, command: object) :
+    def displayAddingSchedule(self, start_time: str, end_time: str, room: str, command: callable) :
         self.isUsedToDisplay = False
         self.text_displayer.text = f"Do You Want to add this schedule? \nTime : {start_time} \nTime : {end_time} \nRoom : {room}"
         self.text_displayer.halign = "left"
+        self.command = command
+        self.proceed_text = "ADD"
+        self.open()
+
+    def displayUnfinishedTransactionInTeacherScreen(self, command : callable):
+        self.isUsedToDisplay = False
+        self.text_displayer.text = f"There is currently Unfinished activities in current screen.\nDo you want to disregard it and continue?"
+        self.text_displayer.halign = "left"
+        self.proceed_text = "PROCEED"
         self.command = command
         self.open()
 
@@ -60,7 +70,16 @@ class FacultyWarningActionsModalView(ModalView) :
         self.text_displayer.halign = "center"
         self.isUsedToDisplay = True
         self.cancelText = "CLOSE"
+        self.proceed_text = ""
         self.command = ObjectProperty(None)
+
+    def displayResetScheduleWarning(self, command : callable):
+        self.isUsedToDisplay = False
+        self.text_displayer.text = f"Do you want to clear all the past save schedule and the current schedule created?"
+        self.text_displayer.halign = "left"
+        self.proceed_text = "PROCEED"
+        self.command = command
+        self.open()
 
 
 class FacultySelectionLocationDropdownContent(MDBoxLayout) :
@@ -241,7 +260,7 @@ class TeachersScreen(Screen) :
     teacher_name: Label = ObjectProperty(None)
     teacher_info: Label = ObjectProperty(None)
 
-    teacher_data: dict = ObjectProperty(None)
+    teacher_data: dict = DictProperty({})
     teacher_key: str = StringProperty("")
 
     days = ( "MONDAY" , "TUESDAY" , "WEDNESDAY" , "THURSDAY" , "FRIDAY" , "SATURDAY", "SUNDAY" )
@@ -251,6 +270,7 @@ class TeachersScreen(Screen) :
     warning : FacultyWarningActionsModalView = ObjectProperty()
 
     new_added_schedule : dict = DictProperty({})
+    removed_schedules : dict = DictProperty({})
 
     def on_kv_post(self, base_widget):
         self.change_faculty_info = ChangeFacultyInfoModalView()
@@ -272,22 +292,21 @@ class TeachersScreen(Screen) :
         for room in data['locations'] :
             for schedule_time in data['locations'][room] :
                 container = ScheduleContainer()
-                # print(f"Selected {schedule_time}")
-                if "/" not in schedule_time:
-                    print(schedule_time , room  )
-                    continue
                 schedule, day = schedule_time.split("/")
                 container.updateOnCreate(schedule_time, room, schedule , self.days[int(day)])
                 container.deleteSchedule = self.removeSchedule
                 self.teacher_schedule.add_widget(container)
 
         # TODO: Update the schedule screen
-
         self.teacher_data = data
 
     def removeSchedule(self, schedule_object : ScheduleContainer ) :
         json_schedule = schedule_object.json_schedule
         room_schedule = schedule_object.room_schedule
+        if room_schedule in self.removed_schedules:
+            self.removed_schedules[room_schedule].append(room_schedule)
+        else:
+            self.removed_schedules[room_schedule] = [room_schedule,]
         self.teacher_data['locations'][room_schedule].remove(json_schedule)
         self.teacher_schedule.remove_widget(widget=schedule_object)
 
@@ -296,6 +315,11 @@ class TeachersScreen(Screen) :
         self.teacher_name.text = name if len(name) else self.teacher_name.text
 
     def resetSchedule(self) :
+        for key, item in self.teacher_data.items():
+            if key in self.removed_schedules:
+                self.removed_schedules[key].append(item)
+            else:
+                self.removed_schedules[key] = [item,]
         self.teacher_data['locations'] = {}
         self.teacher_schedule.clear_widgets()
 
@@ -321,6 +345,19 @@ class TeachersScreen(Screen) :
         self.parent.parent.parent.applyChanges( self.teacher_key, self.teacher_data )
         self.new_added_schedule.clear()
 
+    def disregardActivities(self , changeCommand : callable, screen_name : str):
+        def command():
+            self.removed_schedules.clear()
+            self.new_added_schedule.clear()
+            self.warning.dismiss()
+            changeCommand(screen_name)
+        self.warning.displayUnfinishedTransactionInTeacherScreen(command=command)
+
+    def resetScheduleWarning(self):
+        def command():
+            self.resetSchedule()
+            self.warning.dismiss()
+        self.warning.displayResetScheduleWarning(command)
 
 class NavigationButton(Button) :
     activity: callable = ObjectProperty(None)
@@ -348,6 +385,11 @@ class FacultyScreen(Screen) :
     list_of_screens: dict[str, TeachersScreen] = DictProperty({})
 
     exit_command : callable = ObjectProperty() # Use to exit the
+
+    warning_view : FacultyWarningActionsModalView = ObjectProperty()
+
+    def on_kv_post(self, base_widget):
+        self.warning_view = FacultyWarningActionsModalView()
 
     def applyChanges(self , key : str , new_data : dict):
         self.instructor_data[key] = new_data
@@ -405,6 +447,11 @@ class FacultyScreen(Screen) :
                     child.isSelected = False
 
     def changeScreen(self, name: str) :
+        if self.navigation_screens.current_screen:
+            if self.navigation_screens.current_screen.removed_schedules or self.navigation_screens.current_screen.new_added_schedule:
+                self.navigation_screens.current_screen.disregardActivities(self.changeScreen , name)
+                return
+
         self.current_screen = name
         self.update()
         self.list_of_screens[name].updateDisplay(self.instructor_data[name])
