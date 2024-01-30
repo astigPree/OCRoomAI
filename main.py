@@ -1,5 +1,5 @@
-from kivy.config import Config
-Config.set('graphics', 'fullscreen', 'auto')
+# from kivy.config import Config
+# Config.set('graphics', 'fullscreen', 'auto')
 
 from kivymd.app import MDApp
 from kivy.uix.floatlayout import FloatLayout
@@ -162,8 +162,10 @@ class MainWindow(FloatLayout) :
         self.content.switchScreenByName(screen)
         self.login.dismiss()
 
-    # ---------------------- WRITING DATA ------------------------------
+    def activateCommand(self, command : dict):
+        pass
 
+    # ---------------------- WRITING DATA ------------------------------
 
     def updateNewCommand(self, command : str):
         self.__current_command = command
@@ -173,7 +175,7 @@ class MainWindow(FloatLayout) :
 
     def doneTalking(self , for_guest : bool):
         if for_guest:
-            self.content.get_screen("guest").okeyToChangeScreen()
+            self.content.current_screen.okeyToChangeScreen()
 
     # ---------------------- READING DATA ------------------------------
     @property

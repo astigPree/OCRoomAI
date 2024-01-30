@@ -497,7 +497,6 @@ class FacultyScreen(Screen) :
             nav_button.text = self.instructor_data[nav_button.name]['person']
 
 
-
 # ------------------------ Guest Screens ----------------------
 class LocationImageContainer(BoxLayout) :
     locationName: Label = ObjectProperty()
@@ -547,7 +546,7 @@ class LocationScreenInformation(Screen) :
         if self.isRoom :
             return {"directions" : self.__data["directions"]}
         else :
-            return {"directions" : ["I can't find the location of the instructor", 1]}
+            return {"directions" : [self.directions.info.text, 9]}
 
     def updateOnlyTeacherScreen(self) :
         # TODO: Update the screen if it TEACHER Screen
