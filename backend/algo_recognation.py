@@ -1,4 +1,13 @@
-import os
+import re, pickle, datetime, json, os, typing
+
+FACULTY_SCREEN_LOGIN = ( "ADMIN" , "ADMIN") # Username , Password
+
+
+def whatScreen(self, username : str , password : str) -> typing.Union[None , str]:
+    if username == FACULTY_SCREEN_LOGIN[0] and password == FACULTY_SCREEN_LOGIN[1]:
+        return "faculty"
+    else:
+        return None
 
 
 def saveText(file, tag, text, header=('tags', 'text')) :
@@ -11,117 +20,178 @@ def saveText(file, tag, text, header=('tags', 'text')) :
         f.write(f"{tag},{text}\n")
 
 
+def loadNeededData(filename: str, folder=None, isBytes=False) -> dict :
+    filepath = os.path.join(os.path.dirname(__file__), folder, filename) if folder else os.path.join(
+        os.path.dirname(__file__), filename)
+    with open(filepath, 'rb' if isBytes else 'r') as file :
+        return json.load(file) if not isBytes else pickle.load(file)
+
+
+def loadMainWindowData(self) :
+    # TODO: Load the teachers and rooms data
+    print("Loaded")
+    self.__instructor_data = loadNeededData(filename="instructors_data.json", folder="locations informations")
+    self.__room_data = loadNeededData(filename="locations_data.json", folder="locations informations")
+
+
 def recognizeAlgo(self: object) :
-    import re, pickle, random, datetime, json
+
+    return  # TODO: Debugging Only For UI
 
     from .recognizer import AIMouth, AIEar
-    file = f"new_data {datetime.datetime.now().strftime('%m-%d-%Y')}.csv"
-    file2 = f"new_data response {datetime.datetime.now().strftime('%m-%d-%Y')}.csv"
-
     ear = AIEar()
     mouth = AIMouth()
 
-    # Load All The Information of Locations
-    rooms_information_fullpath = os.path.join(os.path.dirname(__file__), 'wise_data', 'rooms_information.json')
-    instructor_information_fullpath = os.path.join(os.path.dirname(__file__), 'wise_data',
-                                                   'instructor_information.json')
-    with open(rooms_information_fullpath, 'r') as jf :
-        room_info = json.load(jf)
-    with open(instructor_information_fullpath, 'r') as jf :
-        teacher_info = json.load(jf)
+    print("[/] LOAD ALL NEEDED OBJECTS")
 
-    teachers_locations = [
-        "{name} office is situated on the second floor of the red building.",
-        "Visit the second floor of the red building to find the office of {name}",
-        "The red building's second floor is where {name} office is located.",
-        "Looking for {name}? You can find the office on the second floor of the red building.",
-        "To meet with {name}, head to the second floor of the red building where the office is.",
-        "{name} office is on the second floor of the red building."
-    ]
+    # TODO: Load The Model
+    model = loadNeededData('model.pkl', isBytes=True)
+    print("[/] LOAD ALL NEEDED MODEL")
 
-    # Load All Patterns
-    instructor_pattern_fullpath = os.path.join(os.path.dirname(__file__), 'wise_data', 'instructors_patterns.json')
-    room_pattern_fullpath = os.path.join(os.path.dirname(__file__), 'wise_data', 'rooms_pattern.json')
-    with open(instructor_pattern_fullpath, 'r') as jf :
-        persons_patterns = json.load(jf)
-    with open(room_pattern_fullpath, 'r') as jf :
-        rooms_patterns = json.load(jf)
+    # TODO: Load All Patterns
+    rooms_patterns = loadNeededData('rooms_pattern.json', 'wise_data')
+    persons_patterns = loadNeededData('instructors_patterns.json', 'wise_data')
 
-    # Load The Model
-    tags = {1 : "wheres", 0 : "invalid"}
-    model_fullpath = os.path.join(os.path.dirname(__file__), 'model.pkl')
-    with open(model_fullpath, "rb") as pf :
-        model = pickle.load(pf)
+    print("[/] LOAD ALL NEEDED DATA")
+
+    # TODO: create filename for incoming new training data
+    file = f"new_data {datetime.datetime.now().strftime('%m-%d-%Y')}.csv"
+    file2 = f"new_data response {datetime.datetime.now().strftime('%m-%d-%Y')}.csv"
+
+    # TODO: create a loop variables
+    person_found = []
+    room_found = []
 
     print("Start Main Activity".center(40, "-"))
-    while True :  # Main Loop
-        self.activity.text = "LISTENING"
+    while not self.stop_all_running :  # Main Loop
 
-        # Capture the voice
-        text = ear.captureVoice(language='filipino')
-        # text = ear.captureVoiceContinues()
+        # TODO: Capture the voice
+        text = ""
+        if cancelRecording:
+            self.activity.text = "LISTENING"
+            text = ear.captureVoice(language='filipino')
+            # text = ear.captureVoiceContinues()
+        else:
+            self.activity.text = "SILENT"
 
-        # Check if the text is not error
-        if not text:
+        # TODO:  Check if the text is not error
+        if not text :
             continue
 
-        # Check if what the text means using machine learning
+        # TODO: Check if there is any interruption in listening
+        if self.isInterrupted :
+            self.activity.text = "SILENCE"
+            continue
+
+        # TODO: Command Handling
+        # Update the command based on new text pass by new voice input
+        self.command_handler.updateCommandByTextIdentifying(text)
+        # Check if the current command is change/modify after updating
+        if self.command_handler.isThisCurrentCommand(self.COMMAND):
+            # Check if in the built-in command
+            command , metadata = self.command_handler.getCurrentCommand()
+            self.updateNewCommand(command)
+            if command == "activated":
+                self.cancelRecording = True
+                sentence = "I will stay silent or inactive till you user speak the command of activation"
+                self.updateAITalkin(sentence, 9)
+                mouth.talk(sentence)
+            elif command == "unactivated":
+                self.cancelRecording = False
+                sentence = "I will stay silent or inactive till you user speak the command of activation"
+                self.updateAITalkin(sentence, 9)
+                mouth.talk(sentence)
+            elif command == "shutdown" :
+                sentence = "I do have a permission to shutdown or open, Only with keyboard interruptions"
+                self.updateAITalkin(sentence, 9)
+                mouth.talk(sentence)
+            elif command == "open" :
+                sentence = "I do have a permission to shutdown or open, Only with keyboard interruptions"
+                self.updateAITalkin(sentence, 9)
+                mouth.talk(sentence)
+            else:
+                pass
+
+            continue # Use to skip the whole continues activities
+
+
+        # TODO: Check if what the text means using machine learning
         predicted = model.predict([text])
         if predicted[0] == 1 :
 
-            person_found = []
-            # Check if the finding in the text
+            # TODO:  Check if the finding in the text
             for location, pattern in persons_patterns.items() :
                 if re.findall(rf"{pattern}", text) :
                     person_found.append(location)
 
-            room_found = []
             for location, pattern in rooms_patterns.items() :
                 if re.findall(rf"{pattern}", text) :
                     room_found.append(location)
 
             if person_found :
                 for location in person_found :
-                    speech = random.choice(teachers_locations).format(name=random.choice(teacher_info[location]))
+                    # TODO: tell the current location of instructor based on the where instructor time in
+                    # Updating The UI
+                    self.location_selected = location
                     self.activity.text = "TALKING"
-                    mouth.talk(speech)
-                    mouth.talk("Do you want to know what is this building? say yes")
-                    self.activity.text = "LISTENING"
-                    asked = ear.captureVoice(3)
-                    if asked :
-                        choice = "no"
-                        if "yes" in asked or "opo" in asked or "sige" in asked :
-                            self.activity.text = "TALKING"
-                            mouth.talk(room_info['office'][1])
-                            choice = "yes"
-                        saveText(file2, choice, asked, header=('choice', 'response'))
+                    data = self.getGuestScreenData(location)
+                    self.updateAITalking(data['directions'][0] , data['directions'][1])
+                    # BackEnd action
+                    mouth.talk(data["directions"][0])
+                    self.doneTalking(True)
+                    # mouth.talk("Do you want to know what is this building? say yes")
+                    # self.activity.text = "LISTENING"
+                    # asked = ear.captureVoice(3)
+                    # if asked :
+                    #     choice = "no"
+                    #     if "yes" in asked or "opo" in asked or "sige" in asked :
+                    #         self.activity.text = "TALKING"
+                    #         mouth.talk(room_info['office']["directions"][0])
+                    #         choice = "yes"
+                    #     saveText(file2, choice, asked, header=('choice', 'response'))
 
             if room_found :
                 for location in room_found :
+                    # TODO: tell the current location of instructor based on the where instructor time in
+                    # Updating The UI
+                    self.location_selected = location
                     self.activity.text = "TALKING"
-                    mouth.talk(room_info[location][0])
-                    mouth.talk("Do you want to know what is this building? say yes")
-                    self.activity.text = "LISTENING"
-                    asked = ear.captureVoice(3)
-                    if asked :
-                        choice = "no"
-                        if "yes" in asked or "opo" in asked or "sige" in asked :
-                            self.activity.text = "TALKING"
-                            mouth.talk(room_info[location][1])
-                            choice = "yes"
-                        saveText(file2, choice, asked, header=('choice', 'response'))
+                    data = self.getGuestScreenData(location)
+                    self.updateAITalking(data['directions'][0], data['directions'][1])
+                    # BackEnd action
+                    mouth.talk(data["directions"][0])
+                    self.doneTalking(True)
+                    # mouth.talk("Do you want to know what is this building? say yes")
+                    # self.activity.text = "LISTENING"
+                    # asked = ear.captureVoice(3)
+                    # if asked :
+                    #     choice = "no"
+                    #     if "yes" in asked or "opo" in asked or "sige" in asked :
+                    #         self.activity.text = "TALKING"
+                    #         self.updateAITalking(room_info[location]["brief information"][0],
+                    #                              room_info[location]["brief information"][1])
+                    #         mouth.talk(room_info[location]["brief information"][0])
+                    #         choice = "yes"
+                    #     saveText(file2, choice, asked, header=('choice', 'response'))
 
             if not room_found and not person_found :
                 self.activity.text = "TALKING"
+                self.updateAITalking("You are talking about the location in the building or a instructor but I cant understand clearly please repeat it", 7)
                 mouth.talk(
                     "You are talking about the location in the building or a instructor but I cant understand clearly please repeat it")
+                self.doneTalking(True)
 
+            person_found.clear()
+            room_found.clear()
             intent = "wheres"
 
         else :
+            # TODO: tell the user can't understand what user talking
             self.activity.text = "TALKING"
-            self.updateAITalking("My functions only guiding the location in this building, I cant cope what are you talking.", 4)
+            self.updateAITalking(
+                "My functions only guiding the location in this building, I cant cope what are you talking.", 4)
             mouth.talk("My functions only guiding the location in this building, I cant cope what are you talking")
+            self.doneTalking(True)
             intent = "invalid"
 
         saveText(file, intent, text)
