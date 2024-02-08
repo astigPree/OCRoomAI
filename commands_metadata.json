@@ -2,7 +2,8 @@
   "change" : {
     "action" : "change new screen",
     "contradiction" : null,
-    "isBackend" : false
+    "isBackend" : true,
+    "cancelRecording" : true
   },
   "unactivated" : {
     "action" : "close the voice speaker",
