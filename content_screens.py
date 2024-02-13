@@ -625,10 +625,8 @@ class GuestScreen(Screen) :
     def okeyToChangeScreen(self) :
         self.__okey_to_animate = True
 
-    def on_enter(self, *args) :
 
-        self.main_event = Clock.schedule_interval(self.update_activity, 1 / 30)
-
+    def loadImage(self, *args):
         try:
             if self.parent :
 
@@ -652,6 +650,12 @@ class GuestScreen(Screen) :
 
         except AttributeError :  # I put this to handle error when changing screen
             pass
+
+    def on_enter(self, *args) :
+
+        self.main_event = Clock.schedule_interval(self.update_activity, 1 / 30)
+        Clock.schedule_once(self.loadImage)
+
 
     def animate(self , *args):
         self.index_of_screen = self.index_of_screen + 1 if (self.index_of_screen + 1) < len(self.screens_names) else 0

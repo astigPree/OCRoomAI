@@ -48,9 +48,9 @@ MainWindow:
         pos_hint: { 'x' : 0.02 , 'y': 0.4 }
 
     AIImageActions:
+        id : action
         size_hint : 0.2 , 0.3
-        pos : 100 , 0
-        pos_hint: {  'y': 0.08 }
+        pos_hint: { 'x' : 0.02 , 'y': 0.08 }
 
     AIActivity:
         id : activity
@@ -59,26 +59,16 @@ MainWindow:
 
 # ------------------- AI Image Actions ------------
 <AIImageActions>:
-    face : face
-
-    canvas.before:
-        Color:
-            rgba : 0 , 0 , 0, 1
-        Rectangle:
-            pos : self.pos
-            size : self.size
+    action : action
 
     Image:
+        id : action
         size_hint : 1 , 1
         pos_hint : { 'center_x' : 0.5 , 'center_y': 0.5 }
         source : root.image
         allow_stretch : True
         keep_ratio : False
 
-    AIFace:
-        id : face
-        size_hint : 1 , 1
-        pos_hint : { 'center_x' : 0.5 , 'center_y': 0.5 }
 
 <AIFace>:
 

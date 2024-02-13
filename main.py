@@ -1,5 +1,5 @@
-from kivy.config import Config
-Config.set('graphics', 'fullscreen', 'auto')
+# from kivy.config import Config
+# Config.set('graphics', 'fullscreen', 'auto')
 
 from kivymd.app import MDApp
 from kivy.uix.floatlayout import FloatLayout
@@ -8,6 +8,7 @@ from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.modalview import ModalView
 from kivy.uix.textinput import TextInput
+from kivy.uix.image import Image
 
 from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, NumericProperty
 from kivy.lang.builder import Builder
@@ -23,36 +24,9 @@ from kivy.graphics import Rectangle, Color
 from kivy.uix.widget import Widget
 
 
-class AIFace(Widget):
-
-    def __init__(self, **kwargs) :
-        super(AIFace, self).__init__(**kwargs)
-
-        self.bind(size=self.update_canvas)
-
-        with self.canvas :
-            Color( 1 , 1, 1, 1)
-            self.rect = Rectangle(pos=self.pos, size=(50, 50))
-
-    def update_canvas(self, instance, value) :
-        # self.canvas.clear()  # Clear the canvas before adding new instructions
-        self.rect.size = self.size
-        # print(self.pos)
-        print(self.size)
-
-
 class AIImageActions(FloatLayout):
-
     image : str = StringProperty("pictures\\oc robot.png")
-    face : AIFace = ObjectProperty(None)
-
-    def __init__(self , **kwargs):
-        super(AIImageActions , self).__init__(**kwargs)
-
-        self.CENTER = ( self.size[0] / 2 , self.size[1] / 2 )
-
-    def on_kv_post(self, base_widget):
-        print(self.pos)
+    action : Image = ObjectProperty(None)
 
 
 class LogInView(ModalView):
@@ -226,6 +200,7 @@ class MainWindow(FloatLayout) :
         # Check if in the built-in command
         if command == "change" and not self.login.isOpen:
             self.cancelRecording = True
+            self.activity.text = "SILENT"
             self.login.open()
             self.command_handler.removeCommand()
             self.__current_command = ""
@@ -234,17 +209,20 @@ class MainWindow(FloatLayout) :
         if self.content.current == "guest" : # Check if in the user screen
             self.cancelRecording = False
 
-
     # ---------------------- WRITING DATA ------------------------------
 
-    def updateNewCommand(self, command : str):
+    def updateNewCommand(self, command : typing.Union[None , str]):
+        if command is None or not command :
+            return
+        else:
+            print(f"Command : {command}")
         self.__current_command = command
 
     def updateAIText(self, text : str):
         self.__ai_talking = text
 
     def doneTalking(self , for_guest : bool):
-        if for_guest:
+        if for_guest :
             self.content.current_screen.okeyToChangeScreen()
 
     # ---------------------- READING DATA ------------------------------
