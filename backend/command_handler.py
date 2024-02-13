@@ -23,6 +23,7 @@ class CommandHandler:
 
     # ------------- WRITING COMMAND ----------------
     def removeCommand(self) -> typing.NoReturn:
+        print(f"Is this happening?")
         if self.__current_command or self.__current_command_info:
             self.__current_command = None
             self.__current_command_info = None
@@ -34,18 +35,22 @@ class CommandHandler:
         for key in self.__commands:
             for pattern in self.__commands[key]:
                 ratio = fuzz.partial_ratio(pattern , no_space_text)
-                if ratio > rate:
-                    related_commands[key] = ratio if related_commands[key] < ratio else related_commands[key]
+                if ratio >= rate:
+                    print(f"{key} : {text} = {ratio} > {rate}")
+                    if key in related_commands:
+                        related_commands[key] = ratio if related_commands[key] < ratio else related_commands[key]
+                    else:
+                        related_commands[key] = ratio
 
         if not related_commands:
             return
 
-        self.__current_command = max(related_commands, key = related_commands.keys())
+        self.__current_command = max(related_commands, key = lambda key: related_commands[key])
         self.__current_command_info = self.__commands_info[self.__current_command]
 
     # ------------- READING COMMAND ----------------
     def getCurrentCommand(self) -> typing.Union[ tuple[None , None] , tuple[str , dict]]:
-        if self.__current_command or self.__current_command_info:
+        if not self.__current_command or not self.__current_command_info:
             return None , None
         return self.__current_command , self.__current_command_info
 

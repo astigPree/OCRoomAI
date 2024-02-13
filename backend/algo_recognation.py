@@ -36,7 +36,7 @@ def loadMainWindowData(self) :
 
 def recognizeAlgo(self: object) :
 
-    return  # TODO: Debugging Only For UI
+    # return  # TODO: Debugging Only For UI
 
     from .recognizer import AIMouth, AIEar
     ear = AIEar()
@@ -61,15 +61,19 @@ def recognizeAlgo(self: object) :
     # TODO: create a loop variables
     person_found = []
     room_found = []
+    self.activity.text = "LISTENING"
 
     print("Start Main Activity".center(40, "-"))
     while not self.stop_all_running :  # Main Loop
 
         # TODO: Capture the voice
-        text = ""
-        if cancelRecording:
+        if not self.cancelRecording:
             self.activity.text = "LISTENING"
-            text = ear.captureVoice(language='filipino')
+
+        text = ear.captureVoice(language='filipino')
+
+        if not self.cancelRecording:
+            self.activity.text = "LISTENING"
             # text = ear.captureVoiceContinues()
         else:
             self.activity.text = "SILENT"
@@ -78,36 +82,35 @@ def recognizeAlgo(self: object) :
         if not text :
             continue
 
-        # TODO: Check if there is any interruption in listening
-        if self.isInterrupted :
-            self.activity.text = "SILENCE"
-            continue
-
         # TODO: Command Handling
         # Update the command based on new text pass by new voice input
-        self.command_handler.updateCommandByTextIdentifying(text)
+        self.command_handler.updateCommandByTextIdentifying(text , rate=80)
+        command, _ = self.command_handler.getCurrentCommand()
+        # Update the UI COMMAND variable
+        self.updateNewCommand(command)
+
         # Check if the current command is change/modify after updating
         if self.command_handler.isThisCurrentCommand(self.COMMAND):
+            print(f"Backend Command : {command}")
             # Check if in the built-in command
-            command , metadata = self.command_handler.getCurrentCommand()
-            self.updateNewCommand(command)
             if command == "activated":
+                self.cancelRecording = False
+                sentence = "Please don't hesitate to ask the location you want to go in Computer Science Building"
+                self.updateAITalking(sentence, 5)
+                mouth.talk(sentence)
+                self.command_handler.removeCommand()
+            elif command == "unactivated":
                 self.cancelRecording = True
                 sentence = "I will stay silent or inactive till you user speak the command of activation"
-                self.updateAITalkin(sentence, 9)
-                mouth.talk(sentence)
-            elif command == "unactivated":
-                self.cancelRecording = False
-                sentence = "I will stay silent or inactive till you user speak the command of activation"
-                self.updateAITalkin(sentence, 9)
+                self.updateAITalking(sentence, 5)
                 mouth.talk(sentence)
             elif command == "shutdown" :
                 sentence = "I do have a permission to shutdown or open, Only with keyboard interruptions"
-                self.updateAITalkin(sentence, 9)
+                self.updateAITalking(sentence, 5)
                 mouth.talk(sentence)
             elif command == "open" :
                 sentence = "I do have a permission to shutdown or open, Only with keyboard interruptions"
-                self.updateAITalkin(sentence, 9)
+                self.updateAITalking(sentence, 5)
                 mouth.talk(sentence)
             else:
                 pass
@@ -118,6 +121,7 @@ def recognizeAlgo(self: object) :
         # TODO: Check if what the text means using machine learning
         predicted = model.predict([text])
         if predicted[0] == 1 :
+            text = text + " " # Add Space for identifying what room it is
 
             # TODO:  Check if the finding in the text
             for location, pattern in persons_patterns.items() :
