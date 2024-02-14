@@ -1,16 +1,15 @@
 import re, pickle, datetime, json, os, typing
 
-FACULTY_SCREEN_LOGIN = ( "ADMIN" , "ADMIN") # Username , Password
+
+def whatScreen(self, system_data : dict[str : [str , str]] , user_input : tuple[str, str] ) -> typing.Union[None , str]:
+    """ Use to change screen in the main content window by checking the user input and system secured data """
+    for key , values in system_data.items():
+        if values[0] == user_input[0] and values[1] == user_input[1] :
+            return key
+    return None
 
 
-def whatScreen(self, username : str , password : str) -> typing.Union[None , str]:
-    if username == FACULTY_SCREEN_LOGIN[0] and password == FACULTY_SCREEN_LOGIN[1]:
-        return "faculty"
-    else:
-        return None
-
-
-def saveText(file, tag, text, header=('tags', 'text')) :
+def saveText(file, tag, text, header=('tags', 'text')) -> typing.NoReturn :
     folder = os.path.join(os.path.dirname(__file__), 'Training Data', file)
     if not os.path.exists(folder) :
         with open(folder, 'w') as f :
@@ -27,16 +26,16 @@ def loadNeededData(filename: str, folder=None, isBytes=False) -> dict :
         return json.load(file) if not isBytes else pickle.load(file)
 
 
-def loadMainWindowData(self) :
+def loadMainWindowData(self) -> typing.NoReturn :
     # TODO: Load the teachers and rooms data
     print("Loaded")
     self.__instructor_data = loadNeededData(filename="instructors_data.json", folder="locations informations")
     self.__room_data = loadNeededData(filename="locations_data.json", folder="locations informations")
 
 
-def recognizeAlgo(self: object) :
+def recognizeAlgo(self: object) -> typing.NoReturn :
 
-    # return  # TODO: Debugging Only For UI
+    return  # TODO: Debugging Only For UI
 
     from .recognizer import AIMouth, AIEar
     ear = AIEar()
@@ -66,17 +65,28 @@ def recognizeAlgo(self: object) :
     print("Start Main Activity".center(40, "-"))
     while not self.stop_all_running :  # Main Loop
 
-        # TODO: Capture the voice
+        # TODO: Check if the current screen is faculty, then do not record
+        if self.content.current == "faculty" :
+            self.activity.text = "SILENT"
+            continue
+
+        # TODO: Check if current recording
         if not self.cancelRecording:
             self.activity.text = "LISTENING"
 
+        # TODO: Capture the voice
         text = ear.captureVoice(language='filipino')
 
+        # TODO: Check if current recording
         if not self.cancelRecording:
             self.activity.text = "LISTENING"
-            # text = ear.captureVoiceContinues()
         else:
             self.activity.text = "SILENT"
+
+        # TODO: Check if the current screen is faculty, then do not record
+        if self.content.current == "faculty":
+            self.activity.text = "SILENT"
+            text = ""
 
         # TODO:  Check if the text is not error
         if not text :
@@ -116,7 +126,6 @@ def recognizeAlgo(self: object) :
                 pass
 
             continue # Use to skip the whole continues activities
-
 
         # TODO: Check if what the text means using machine learning
         predicted = model.predict([text])
