@@ -297,8 +297,8 @@ class TeachersScreen(Screen) :
         self.teacher_name.text = data['person']
 
         # For debugging
-        if data['person'] == "Justine Aban" :
-            print(f"Aban Locations : {data['locations']}")
+        # if data['person'] == "Justine Aban" :
+        #     print(f"Aban Locations : {data['locations']}")
 
         self.teacher_schedule.clear_widgets()  # Clear the display widgets
         for room in data['locations'] :
@@ -431,7 +431,7 @@ class FacultyScreen(Screen) :
         self.parent.parent.saveNewData(filename=filename , data=self.instructor_data , folder=folder)
         self.update_navigation_content()
 
-    def on_enter(self, *args) :
+    def displayWindow(self, *args):
         if self.parent :
 
             self.exit_command = self.parent.switchScreenByName
@@ -453,16 +453,20 @@ class FacultyScreen(Screen) :
                 self.navigation_buttons.add_widget(navBut)
 
                 # Creating Navigation Screen
-                screen = TeachersScreen()
+                screen = TeachersScreen(name=key)
                 screen.teacher_key = key
                 screen.updateDisplay(values)
                 self.list_of_screens[key] = screen
 
                 # Checking if it has screen used
                 if not self.current_screen :
+
                     self.changeScreen(key)
 
             self.update()
+
+    def on_enter(self, *args) :
+        self.displayWindow()
 
     def getKeyByRoomName(self , room : str ) -> str :
         for key in self.room_data:
@@ -481,14 +485,24 @@ class FacultyScreen(Screen) :
                     child.isSelected = False
 
     def changeScreen(self, name: str) :
+        # This 3 lines here use to identify if there is any changes in the data of the instructor
         if self.navigation_screens.current_screen:
             if self.navigation_screens.current_screen.isThereAnyChanges() :
                 self.navigation_screens.current_screen.disregardActivities(self.changeScreen , name)
                 return
 
         self.current_screen = name
-        self.update()
-        self.list_of_screens[name].updateDisplay(self.instructor_data[name])
+        self.update() # Update the navigation's button
+        # Check if the screen exist before changing
+        if name in self.list_of_screens:
+            self.list_of_screens[name].updateDisplay(self.instructor_data[name])
+        # else:
+        #     screen = TeachersScreen(name =name)
+        #     screen.teacher_key = name
+        #     screen.updateDisplay(self.instructor_data[name])
+        #     self.list_of_screens[name] = screen
+
+        print(f"Exist {name}: {name in self.list_of_screens}")
         self.navigation_screens.switch_to(self.list_of_screens[name])
         self.update_navigation_content()
 
@@ -625,8 +639,8 @@ class GuestScreen(Screen) :
     def okeyToChangeScreen(self) :
         self.__okey_to_animate = True
 
-
     def loadImage(self, *args):
+        self.main_event = Clock.schedule_interval(self.update_activity, 1 / 30)
         try:
             if self.parent :
 
@@ -652,10 +666,7 @@ class GuestScreen(Screen) :
             pass
 
     def on_enter(self, *args) :
-
-        self.main_event = Clock.schedule_interval(self.update_activity, 1 / 30)
         Clock.schedule_once(self.loadImage)
-
 
     def animate(self , *args):
         self.index_of_screen = self.index_of_screen + 1 if (self.index_of_screen + 1) < len(self.screens_names) else 0

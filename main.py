@@ -1,5 +1,5 @@
-# from kivy.config import Config
-# Config.set('graphics', 'fullscreen', 'auto')
+from kivy.config import Config
+Config.set('graphics', 'fullscreen', 'auto')
 
 from kivymd.app import MDApp
 from kivy.uix.floatlayout import FloatLayout
@@ -9,6 +9,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.modalview import ModalView
 from kivy.uix.textinput import TextInput
 from kivy.uix.image import Image
+from kivymd.uix.relativelayout import MDRelativeLayout
 
 from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, NumericProperty
 from kivy.lang.builder import Builder
@@ -20,13 +21,17 @@ import os, pickle, json , typing
 
 from content_screens import GuestScreen, FacultyScreen, DeveloperScreen
 
-from kivy.graphics import Rectangle, Color
-from kivy.uix.widget import Widget
 
-
-class AIImageActions(FloatLayout):
-    image : str = StringProperty("pictures\\oc robot.png")
+class AIImageActions(MDRelativeLayout):
+    image : str = StringProperty(os.path.join(os.path.dirname(__file__), 'pictures', 'oc robot.png'))
     action : Image = ObjectProperty(None)
+    face : MDRelativeLayout = ObjectProperty(None)
+    eyes : Label = ObjectProperty(None)
+    nose : Label = ObjectProperty(None)
+    lips : Label = ObjectProperty(None)
+
+    def moveTheEyes(self):
+        pass
 
 
 class LogInView(ModalView):
@@ -67,7 +72,7 @@ class ContentWindow(ScreenManager) :
     listOfScreen = { 'guest' : GuestScreen , 'faculty' : FacultyScreen , 'dev' : DeveloperScreen}
 
     def on_parent(self, *args) :
-        screen = self.listOfScreen['guest']()
+        screen = self.listOfScreen['dev']()
         self.switch_to(screen)
 
     def switchScreenByName(self, name : str):
@@ -85,6 +90,8 @@ class MainWindow(FloatLayout) :
     size_effect = NumericProperty(5.0)
     stop_all_running = BooleanProperty(False)
     __ai_talking: str = StringProperty("This is a test of the UI Display asjdf sdfjo jsdf jsdafj sadjo joojds oj dsf")
+    scrolling_clock : Clock = ObjectProperty(None)
+    user_command_clock : Clock = ObjectProperty(None)
 
     location_selected : str = StringProperty("") # Used to be connection to algo_recognation when changing screen
 
@@ -92,12 +99,14 @@ class MainWindow(FloatLayout) :
     __room_data : dict = ObjectProperty(None)
     __commands_pattern : dict = ObjectProperty(None)
     __commands_metadata : dict = ObjectProperty(None)
+    __system_data : dict = ObjectProperty(None)
 
     __current_command : str = StringProperty("") # Used to control the manage the whole system
     cancelRecording : bool = BooleanProperty(False)  # Use to modify if there is a recording of user voice or not
 
     __room_filename= ( "locations_data.json", "locations_informations")
     __instructor_filename = ("instructors_data.json", "locations_informations")
+    __system_filename = ("system_data.ai" , "locations_informations")
 
     from backend.algo_recognation import recognizeAlgo , whatScreen
 
@@ -136,20 +145,20 @@ class MainWindow(FloatLayout) :
             return json.dump(data, file, indent=4) if not isBytes else pickle.dump(data, file)
 
     def loadScreenData(self) :
-        # TODO: Load the teachers and rooms data
+        # TODO: Load the teachers and rooms data and System
         self.__instructor_data = self.loadNeededData(filename=self.__instructor_filename[0], folder=self.__instructor_filename[1])
         self.__room_data = self.loadNeededData(filename=self.__room_filename[0], folder=self.__room_filename[1])
+        self.__system_data = self.loadNeededData(filename = self.__system_filename[0] , folder=self.__system_filename[1] , isBytes=True)
+
         self.__commands_pattern = self.loadNeededData(filename="command_keywords.json")
         self.__commands_metadata = self.loadNeededData(filename="commands_metadata.json")
 
         self.command_handler.updateCommand(self.__commands_pattern.copy() , self.__commands_metadata.copy())
 
     def on_kv_post(self, base_widget):
-        print(f"The String does not value {not self.__current_command}")
         self.ids['picture'].ids['picture'].source = os.path.join(os.path.dirname(__file__), 'pictures', 'building.jpg')
-
-        Clock.schedule_interval(self.updateScrolling , 1/30)
-        Clock.schedule_interval(self.checkUserCommands , 1 / 30)
+        self.scrolling_clock = Clock.schedule_interval(self.updateScrolling , 1/30)
+        self.user_command_clock = Clock.schedule_interval(self.checkUserCommands , 1 / 30)
 
     def close(self):
         self.stop_all_running = True
@@ -181,7 +190,7 @@ class MainWindow(FloatLayout) :
 
     def changeScreen(self, username : str , password : str):
         """Use to change screen with login modal view """
-        screen = self.whatScreen(username , password)
+        screen = self.whatScreen( self.__system_data.copy() , (username , password) )
 
         if not screen:
             self.login.timer = 0
@@ -277,9 +286,10 @@ class RoomAIApp(MDApp) :
 
 
 if __name__ == "__main__" :
-    LabelBase.register(name="ai_font", fn_regular="fonts/OpenSans-Semibold.ttf")
-    LabelBase.register(name="title_font" , fn_regular="fonts/OpenSans-Bold.ttf")
-    LabelBase.register(name="content_font" , fn_regular="fonts/OpenSans-Regular.ttf")
+    LabelBase.register(name="ai_font", fn_regular=os.path.join(os.path.dirname(__file__), 'fonts', 'OpenSans-Semibold.ttf'))
+    LabelBase.register(name="title_font" , fn_regular=os.path.join(os.path.dirname(__file__), 'fonts', 'OpenSans-Bold.ttf'))
+    LabelBase.register(name="content_font" , fn_regular=os.path.join(os.path.dirname(__file__), 'fonts', 'OpenSans-Regular.ttf'))
+    LabelBase.register(name="ai_eye" , fn_regular=os.path.join(os.path.dirname(__file__), 'fonts', 'Kablokhead-xxY5.ttf'))
     try :
         RoomAIApp().run()
     except Exception as e:
