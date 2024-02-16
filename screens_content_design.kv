@@ -615,6 +615,271 @@
         Widget:
             size_hint : 0.35 , 1
 
+<SettingPasswordForm>:
+    orientation : 'vertical'
+    padding : [ dp(0) , dp(0) , dp(10) , dp(0) ]
+    spacing : dp(5)
+
+    BoxLayout:
+        size_hint : 1, 0.5
+
+        SettingScreenPasswordTitleLabel:
+            size_hint : 0.3 , 1
+
+        TextInput:
+            size_hint : 0.7 , 1
+
+    BoxLayout:
+        size_hint : 1, 0.5
+        spacing : dp(3)
+
+        SettingScreenPasswordTitleLabel:
+            text : "PASSWORD :"
+            size_hint : 0.3 , 1
+
+        TextInput:
+            size_hint : 0.7 , 1
+
+<SettingScreen>:
+
+
+    FloatLayout:
+        size_hint : 1, 1
+        canvas.before:
+            Color:
+                rgba : chex("eff3f4")
+            RoundedRectangle:
+                pos : self.pos
+                size : self.size
+                radius : ( min(self.size) * 0.08, )
+
+
+        # Security Modifier
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint : 0.63 , 0.47
+            pos_hint: { 'x' : 0.03 , 'y' : 0.05 }
+            padding : dp(5)
+            spacing : dp(3)
+            canvas.before:
+                Color:
+                    rgba : chex("7f0f0f")
+                Rectangle:
+                    pos : self.pos
+                    size : self.size
+
+            SettingsScreenTitleLabel:
+                size_hint : 0.3 , 0.1
+
+            SettingPasswordForm:
+                size_hint : 1 , 0.3
+
+            SettingsScreenTitleLabel:
+                size_hint : 0.3 , 0.1
+
+            SettingPasswordForm:
+                size_hint : 1 , 0.3
+
+            BoxLayout:
+                size_hint : 1, 0.3
+                padding : dp(2)
+                spacing : dp(5)
+
+                SettingScreenPasswordInformationLabel:
+                    size_hint : 0.5 ,1
+
+                BoxLayout:
+                    size_hint : 0.5 , 1
+
+                    on_size:
+                        self.padding = min(self.size) * 0.2
+
+                    MDRaisedButton:
+                        md_bg_color : chex("0da42e")
+                        text : "UPDATE PASSWORD"
+                        font_name : "title_font"
+                        size_hint : 1 , 1
+                        theme_text_color: "Custom"
+                        text_color : 'white'
+                        line_color : chex('efefee')
+
+                        on_size:
+                            self.font_size = min(self.size) * 0.5
+
+
+
+
+
+
+        # Building Information
+        BoxLayout:
+            size_hint : 0.95 , 0.42
+            pos_hint: { 'center_x' : 0.5 , 'y' : 0.55 }
+            padding : dp(15)
+            spacing : dp(10)
+            canvas.before:
+                Color:
+                    rgba : chex("7f0f0f")
+                Rectangle:
+                    pos : self.pos
+                    size : self.size
+
+            BoxLayout:
+                size_hint : 0.3 , 1
+                orientation : 'vertical'
+
+                Image:
+                    id : room_picture
+                    size_hint : 1 , 0.8
+                    allow_stretch : True
+                    keep_ratio : False
+                    keep_data : True
+
+                Label:
+                    size_hint : 1 , 0.2
+                    color : chex("7f0f0f")
+                    text : "ROOM PICTURE"
+                    font_name : 'title_font'
+
+                    canvas.before:
+                        Color:
+                            rgba : chex('efefee')
+                        Rectangle:
+                            pos : self.pos
+                            size : self.size
+                    on_size:
+                        self.font_size = min(self.size) * 0.4
+
+            BoxLayout:
+                orientation : 'vertical'
+                size_hint : 0.7 , 1
+
+                BoxLayout:
+                    size_hint : 1 , 0.3
+                    spacing : dp(5)
+                    padding : dp(5)
+
+                    MDRaisedButton:
+                        md_bg_color : chex("dabbbb")
+                        text : "CLICK HERE TO SELECT ROOM"
+                        font_name : "title_font"
+                        size_hint : 0.5 , 1
+                        theme_text_color: "Custom"
+                        text_color : chex("7f0f0f")
+                        line_color : chex('efefee')
+
+                        on_size:
+                            self.font_size = min(self.size) * 0.3
+
+
+                    Label:
+                        size_hint : 0.5 , 1
+                        color : chex('0da22e') # chex('bf0a10')
+                        text : "currently save the changes in information about the room"
+                        font_name : 'title_font'
+
+                        on_parent:
+                            self.text_size = self.width - dp(10), None
+                            self.font_size = min(self.size) * 0.3
+
+                        on_size:
+                            self.text_size = self.width - dp(20), None
+                            self.font_size = min(self.size) * 0.3
+
+
+                        canvas.before:
+                            Color:
+                                rgba : chex('efefee')
+                            Rectangle:
+                                pos : self.pos
+                                size : self.size
+
+                BoxLayout:
+                    size_hint : 1 , 0.7
+                    canvas.before:
+                        Color:
+                            rgba : chex('efefee')
+                        Rectangle:
+                            pos : self.pos
+                            size : self.size
+
+                    TextInput :
+                        size_hint : 1 , 1
+                        background_color : 0, 0 , 0 , 0
+                        cursor_color : chex("7f0f0f")
+                        foreground_color : chex("7f0f0f")
+                        multiline : True
+                        font_name : "content_font"
+                        valign : "center"
+
+                        on_parent:
+                            self.font_size = min(self.size) * 0.13
+                        on_size:
+                            self.font_size = min(self.size) * 0.13
+
+
+        # Settings Activity
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint : 0.25 , 0.42
+            pos_hint: { 'right' : 0.97 , 'y' : 0.12 }
+            canvas.before:
+                Color:
+                    rgba : chex("7f0f0f")
+                RoundedRectangle:
+                    pos : self.pos
+                    size : self.size
+                    radius : ( min(self.size) * 0.05, )
+
+            Label:
+                size_hint : 1 , 0.25
+                text : "ACTIVITY"
+                color : chex("7f0f0f")
+                font_name : "title_font"
+                canvas.before:
+                    Color:
+                        rgba : chex("dabbbb")
+                    RoundedRectangle:
+                        pos : self.pos
+                        size : self.size
+                        radius : ( min(self.parent.size) * 0.05, )
+                on_size:
+                    self.font_size = min(self.size) * 0.5
+
+            BoxLayout:
+                orientation : 'vertical'
+                size_hint: 1 , 0.75
+                on_parent:
+                    self.padding =  min(self.size) * 0.05
+                    self.spacing = min(self.size) * 0.025
+                on_size:
+                    self.padding =  min(self.size) * 0.05
+                    self.spacing = min(self.size) * 0.025
+
+
+                FacultyScreenActivityButton:
+                    text : "Apply Changes"
+                    color : chex('0da42e')
+                    on_release:
+
+                FacultyScreenActivityButton:
+                    text : "Information"
+                    color : chex("7f0f0f")
+                    on_release :
+
+                FacultyScreenActivityButton:
+                    text : "Goto Main Screen"
+                    color : chex('0da42e')
+                    on_release :
+                        root.goBackToMainScreen()
+
+                FacultyScreenActivityButton:
+                    text : "Shutdown"
+                    color : chex('bf090f') #chex('0da42e')
+                    on_release :
+                        app.stop()
+
+
 
 <TeachersScreen>:
 
@@ -862,6 +1127,50 @@
 # ======================= ADDITIONAL DESIGN =================================
 
 #                     ------------------ FACULTY SCREEN --------------
+
+<SettingScreenPasswordInformationLabel@Label>:
+    text : "Please be careful when changing the password, it can't be recover unless with the help of developers."
+    color : chex('bf090f')
+    font_name : "title_font"
+
+    canvas.before:
+        Color:
+            rgba : chex('efefee')
+        Rectangle:
+            pos : self.pos
+            size : self.size
+
+    on_size:
+        self.text_size = self.width - dp(10), None
+        self.font_size = min(self.size) * 0.2
+
+<SettingScreenPasswordTitleLabel@Label>:
+    size_hint : 0.3 , 1
+    text : "USERNAME : "
+    halign : 'right'
+    font_name : "content_font"
+
+    on_size:
+        self.text_size = self.width - dp(10), None
+        self.font_size = min(self.size) * 0.5
+
+<SettingsScreenTitleLabel@Label>:
+    font_name : 'title_font'
+    text : "PAST PASSWORD"
+    color : "black"
+
+    canvas.before:
+        Color:
+            rgba : chex('efefee')
+        RoundedRectangle:
+            pos : self.pos
+            size : self.size
+            radius : (16 ,)
+
+    on_size:
+        self.font_size = min(self.size) * 0.6
+
+
 <ChangeFacultyInfoModalViewButtonCancel@Button>:
     background_color : 0 , 0, 0, 0
     background_down : ""

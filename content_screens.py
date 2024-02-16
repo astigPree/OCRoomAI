@@ -24,6 +24,10 @@ Clock.max_iteration = 60
 
 
 # ------------------------ Faculty Screens ----------------------
+class SettingPasswordForm(MDBoxLayout):
+    pass
+
+
 class FacultyDropDownButton(MDFillRoundFlatButton) :
     command: callable = ObjectProperty(None)
 
@@ -83,9 +87,17 @@ class FacultyWarningActionsModalView(ModalView) :
 
     def displayApplyingChanges(self, command : callable ):
         self.isUsedToDisplay = False
-        self.text_displayer.text = f"Do you want to save the new changes in this screen?"
+        self.text_displayer.text = "Do you want to save the new changes in this screen?"
         self.text_displayer.halign = "left"
         self.proceed_text = "APPLY CHANGES"
+        self.command = command
+        self.open()
+
+    def displayInfoBeforeExiting(self, command : callable):
+        self.isUsedToDisplay = False
+        self.text_displayer.text = f"Do you want to start the activity of guest inqueries handling? If you want to just click the \'GOTO MAIN SCREEN\' to go back to main screen where the activities executed."
+        self.text_displayer.halign = "center"
+        self.proceed_text = "GOTO MAIN SCREEN"
         self.command = command
         self.open()
 
@@ -262,7 +274,26 @@ class ScheduleContainer(BoxLayout) :
         self.schedule = f"{schedule_1} - {schedule_2}"
 
 
+class SettingScreen(Screen):
+
+    isSettings: bool = BooleanProperty(True)
+
+    warning : FacultyWarningActionsModalView = ObjectProperty(None)
+
+    def on_kv_post(self, base_widget):
+        self.warning = FacultyWarningActionsModalView()
+
+    def goBackToMainScreen(self):
+        def command():
+            self.warning.dismiss()
+            self.parent.parent.parent.changeToGuestScreen()
+        self.warning.displayInfoBeforeExiting(command)
+
+
 class TeachersScreen(Screen) :
+
+    isSettings : bool = BooleanProperty(False)
+
     teacher_schedule: MDGridLayout = ObjectProperty(None)
     teacher_image: Image = ObjectProperty(None)
     teacher_name: Label = ObjectProperty(None)
@@ -288,7 +319,7 @@ class TeachersScreen(Screen) :
         self.change_faculty_info.holder = self
         self.change_faculty_info.updateInfo = self.updateNameAndInfo
         self.add_schedule.holder = self
-        self.warning.holder = self
+        # self.warning.holder = self
 
     def updateDisplay(self, data: dict) :
         # Update the display contain in schedule of each teacher
@@ -443,6 +474,17 @@ class FacultyScreen(Screen) :
             self.instructor_data = self.parent.parent.getInstructorData()
 
             self.navigation_buttons.clear_widgets()
+
+            # Create Settings Screen
+            settings_screen = SettingScreen()
+            self.list_of_screens["setting"] = settings_screen
+            # Creating Navigation Button
+            navBut = NavigationButton()
+            navBut.text = "S E T T I N G S"
+            navBut.activity = self.changeScreen
+            navBut.name = 'setting'
+            self.navigation_buttons.add_widget(navBut)
+
             for key, values in self.instructor_data.items() :
 
                 # Creating Navigation Button
@@ -452,15 +494,13 @@ class FacultyScreen(Screen) :
                 navBut.name = key
                 self.navigation_buttons.add_widget(navBut)
 
-                # Creating Navigation Screen
-                screen = TeachersScreen(name=key)
-                screen.teacher_key = key
-                screen.updateDisplay(values)
-                self.list_of_screens[key] = screen
-
                 # Checking if it has screen used
                 if not self.current_screen :
-
+                    # Creating Navigation Screen
+                    screen = TeachersScreen(name=key)
+                    screen.teacher_key = key
+                    screen.updateDisplay(values)
+                    self.list_of_screens[key] = screen
                     self.changeScreen(key)
 
             self.update()
@@ -487,20 +527,26 @@ class FacultyScreen(Screen) :
     def changeScreen(self, name: str) :
         # This 3 lines here use to identify if there is any changes in the data of the instructor
         if self.navigation_screens.current_screen:
-            if self.navigation_screens.current_screen.isThereAnyChanges() :
-                self.navigation_screens.current_screen.disregardActivities(self.changeScreen , name)
-                return
+            if not self.navigation_screens.current_screen.isSettings:
+                # Check if there is any changes
+                if self.navigation_screens.current_screen.isThereAnyChanges() :
+                    # Check if the selected screen is same as clicked
+                    if self.current_screen == name :
+                        return
+                    self.navigation_screens.current_screen.disregardActivities(self.changeScreen , name)
+                    return
 
         self.current_screen = name
         self.update() # Update the navigation's button
         # Check if the screen exist before changing
         if name in self.list_of_screens:
-            self.list_of_screens[name].updateDisplay(self.instructor_data[name])
-        # else:
-        #     screen = TeachersScreen(name =name)
-        #     screen.teacher_key = name
-        #     screen.updateDisplay(self.instructor_data[name])
-        #     self.list_of_screens[name] = screen
+            if not self.list_of_screens[name].isSettings:
+                self.list_of_screens[name].updateDisplay(self.instructor_data[name])
+        else:
+            screen = TeachersScreen(name =name)
+            screen.teacher_key = name
+            screen.updateDisplay(self.instructor_data[name])
+            self.list_of_screens[name] = screen
 
         print(f"Exist {name}: {name in self.list_of_screens}")
         self.navigation_screens.switch_to(self.list_of_screens[name])
@@ -508,7 +554,15 @@ class FacultyScreen(Screen) :
 
     def update_navigation_content(self) :
         for nav_button in self.navigation_buttons.children :
+            if nav_button.text == "S E T T I N G S":
+                continue
             nav_button.text = self.instructor_data[nav_button.name]['person']
+
+    def changeToGuestScreen(self):
+        if not self.parent:
+            return
+
+        self.parent.switchScreenByName("guest")
 
 
 # ------------------------ Guest Screens ----------------------
