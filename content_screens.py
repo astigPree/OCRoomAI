@@ -24,8 +24,25 @@ Clock.max_iteration = 60
 
 
 # ------------------------ Faculty Screens ----------------------
+class FacultySettingsDropDownButton(MDFillRoundFlatButton):
+    command: callable = ObjectProperty(None)
+
+    def on_release(self) :
+        self.command(self.text)
+
+
 class SettingPasswordForm(MDBoxLayout):
-    pass
+    username: TextInput = ObjectProperty(None)
+    password: TextInput = ObjectProperty(None)
+
+    def comparison(self, passed_username : str , passed_password : str) -> bool:
+        if self.username.text == passed_username and passed_password == self.password.text:
+            return True
+        return False
+
+    def clearInput(self):
+        self.username.text = ""
+        self.password.text = ""
 
 
 class FacultyDropDownButton(MDFillRoundFlatButton) :
@@ -98,6 +115,15 @@ class FacultyWarningActionsModalView(ModalView) :
         self.text_displayer.text = f"Do you want to start the activity of guest inqueries handling? If you want to just click the \'GOTO MAIN SCREEN\' to go back to main screen where the activities executed."
         self.text_displayer.halign = "center"
         self.proceed_text = "GOTO MAIN SCREEN"
+        self.command = command
+        self.open()
+
+    def displaySavingNewFacultySecurity(self , command : callable):
+        self.isUsedToDisplay = False
+        self.text_displayer.text = "There is no turning BACK, by changing the system when the faculty member who will enter this screen must use the new security such as USERNAME and PASSWORD. Do you agree the changes of the system security?"
+        self.text_displayer.halign = "left"
+        self.proceed_text = "I AGREE"
+        self.cancelText = "I DON'T AGREE"
         self.command = command
         self.open()
 
@@ -279,9 +305,95 @@ class SettingScreen(Screen):
     isSettings: bool = BooleanProperty(True)
 
     warning : FacultyWarningActionsModalView = ObjectProperty(None)
+    dropdown_button : MDFillRoundFlatButton = ObjectProperty(None)
+    data_warning : Label = ObjectProperty(None)
+    data_input : TextInput = ObjectProperty(None)
+    room_picture : Image = ObjectProperty(None)
+    dropdown_list : DropDown = ObjectProperty(None)
+
+    past_security : SettingPasswordForm = ObjectProperty(None)
+    new_security : SettingPasswordForm = ObjectProperty(None)
+
+    __room_data : dict = DictProperty({})
+
+    __past_text : str = StringProperty("sdfsd") # Use to check if there is edited happen in textbox
+    __selected_room : dict = DictProperty({})
 
     def on_kv_post(self, base_widget):
         self.warning = FacultyWarningActionsModalView()
+
+    def applyChanges(self):
+        # Check if okey to save
+        room_key = None
+        for key in self.__room_data:
+            if self.__room_data[key]['name'] == self.dropdown_button.text:
+                room_key : str = key
+                break
+
+        if not room_key or self.__past_text == self.data_input.text:
+            return
+
+        # Update the room data
+        self.__selected_room['brief information'][0] = self.data_input.text
+
+        def command():
+            self.parent.parent.parent.applyChanges( room_key, self.__selected_room , True)
+            self.data_warning.text = "Successfully saved the new information about the room!"
+            self.data_warning.color = chex('0da22e')
+            self.warning.dismiss()
+
+        self.warning.displayApplyingChanges(command)
+
+    def changeScreenSecurity(self):
+        username, password = self.parent.parent.parent.getSecurity()
+        if not self.past_security.comparison(username , password):
+            self.warning.displayError("The past security does not matches the faculty system security!")
+            return
+
+        def command():
+            self.parent.parent.parent.changeSecurity(self.new_security.username.text , self.new_security.password.text )
+            self.past_security.clearInput()
+            self.new_security.clearInput()
+            self.warning.dismiss()
+
+        self.warning.displaySavingNewFacultySecurity(command)
+
+    def checkChanges(self, *args):
+        if not self.__past_text:
+            return
+        if self.__past_text != self.data_input.text:
+            self.data_warning.text = "Currently there is a changes in the data, save it!"
+            self.data_warning.color = chex('bf0a10')
+
+    def initializedData(self, *args):
+
+        if self.dropdown_list:
+            return
+        self.__room_data = self.parent.parent.parent.room_data
+
+        self.dropdown_list = DropDown()
+        content_box = FacultySelectionLocationDropdownContent()
+
+        for room in self.__room_data:
+            dropButton = FacultySettingsDropDownButton(text=self.__room_data[room]['name'])
+            dropButton.command = self.changeRoom
+            content_box.add_widget(dropButton)
+        self.dropdown_list.add_widget(content_box)
+
+    def on_enter(self, *args):
+        Clock.schedule_once(self.initializedData)
+
+    def changeRoom(self , name : str):
+        self.dropdown_button.text = name
+
+        for key , values in self.__room_data.items():
+            if values['name'] == name:
+                self.__past_text = values['brief information'][0]
+                self.data_input.text = values['brief information'][0]
+                self.room_picture.source = values['building picture']
+                self.__selected_room = values
+
+        self.dropdown_list.dismiss()
 
     def goBackToMainScreen(self):
         def command():
@@ -456,11 +568,22 @@ class FacultyScreen(Screen) :
     def on_kv_post(self, base_widget):
         self.warning_view = FacultyWarningActionsModalView()
 
-    def applyChanges(self , key : str , new_data : dict):
-        self.instructor_data[key] = new_data
-        folder , filename = self.parent.parent.instructor_filename
-        self.parent.parent.saveNewData(filename=filename , data=self.instructor_data , folder=folder)
-        self.update_navigation_content()
+    def getSecurity(self) -> tuple[str, str]:
+        return self.parent.parent.facultySecurity
+
+    def changeSecurity(self, new_username : str , new_password : str):
+        self.parent.parent.updateFacultySecurity(new_username , new_password)
+
+    def applyChanges(self , key : str , new_data : dict , isRoom = False):
+        if isRoom:
+            self.room_data[key] = new_data
+            folder , filename = self.parent.parent.room_filename
+            self.parent.parent.saveNewData(filename=filename , data=self.room_data , folder=folder)
+        else:
+            self.instructor_data[key] = new_data
+            folder , filename = self.parent.parent.instructor_filename
+            self.parent.parent.saveNewData(filename=filename , data=self.instructor_data , folder=folder)
+            self.update_navigation_content()
 
     def displayWindow(self, *args):
         if self.parent :

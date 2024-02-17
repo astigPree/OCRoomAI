@@ -152,6 +152,14 @@
 
 
 # ------------------------ Faculty Screens ---------------------
+<FacultySettingsDropDownButton>:
+    size_hint : (1, None)
+    height : 44
+    md_bg_color : chex("620609")
+    font_name : "ai_font"
+    on_size:
+        self.font_size = ( min(self.size) * 0.5 ) - ( len(self.text) * 0.2) if len(self.text) > 10 else (min(self.size) * 0.5 )
+
 <FacultyDropDownButton>:
     size_hint : (1, None)
     height : 44
@@ -620,6 +628,9 @@
     padding : [ dp(0) , dp(0) , dp(10) , dp(0) ]
     spacing : dp(5)
 
+    username : username
+    password : password
+
     BoxLayout:
         size_hint : 1, 0.5
 
@@ -627,6 +638,7 @@
             size_hint : 0.3 , 1
 
         TextInput:
+            id : username
             size_hint : 0.7 , 1
 
     BoxLayout:
@@ -638,10 +650,18 @@
             size_hint : 0.3 , 1
 
         TextInput:
+            id : password
             size_hint : 0.7 , 1
 
 <SettingScreen>:
 
+    dropdown_button : dropdown_button
+    data_warning : data_warning
+    data_input : data_input
+    room_picture : room_picture
+
+    past_security : past_security
+    new_security : new_security
 
     FloatLayout:
         size_hint : 1, 1
@@ -672,12 +692,15 @@
                 size_hint : 0.3 , 0.1
 
             SettingPasswordForm:
+                id : past_security
                 size_hint : 1 , 0.3
 
             SettingsScreenTitleLabel:
+                text : "NEW PASSWORD"
                 size_hint : 0.3 , 0.1
 
             SettingPasswordForm:
+                id : new_security
                 size_hint : 1 , 0.3
 
             BoxLayout:
@@ -705,10 +728,8 @@
 
                         on_size:
                             self.font_size = min(self.size) * 0.5
-
-
-
-
+                        on_release:
+                            root.changeScreenSecurity()
 
 
         # Building Information
@@ -760,6 +781,7 @@
                     padding : dp(5)
 
                     MDRaisedButton:
+                        id : dropdown_button
                         md_bg_color : chex("dabbbb")
                         text : "CLICK HERE TO SELECT ROOM"
                         font_name : "title_font"
@@ -769,13 +791,17 @@
                         line_color : chex('efefee')
 
                         on_size:
-                            self.font_size = min(self.size) * 0.3
+                            self.font_size = ( min(self.size) * 0.4 ) - ( len(self.text) * 0.2) if len(self.text) > 10 else (min(self.size) * 0.4 )
+
+                        on_release:
+                            root.dropdown_list.open(*args)
 
 
                     Label:
+                        id : data_warning
                         size_hint : 0.5 , 1
-                        color : chex('0da22e') # chex('bf0a10')
-                        text : "currently save the changes in information about the room"
+                        color : chex('0da22e') # chex('0da22e') <- only use when saving
+                        text : "By selecting a room, you can edit the brief information"
                         font_name : 'title_font'
 
                         on_parent:
@@ -804,6 +830,7 @@
                             size : self.size
 
                     TextInput :
+                        id : data_input
                         size_hint : 1 , 1
                         background_color : 0, 0 , 0 , 0
                         cursor_color : chex("7f0f0f")
@@ -816,6 +843,8 @@
                             self.font_size = min(self.size) * 0.13
                         on_size:
                             self.font_size = min(self.size) * 0.13
+                        on_text:
+                            root.checkChanges()
 
 
         # Settings Activity
@@ -861,6 +890,7 @@
                     text : "Apply Changes"
                     color : chex('0da42e')
                     on_release:
+                        root.applyChanges()
 
                 FacultyScreenActivityButton:
                     text : "Information"

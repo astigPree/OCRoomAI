@@ -9,6 +9,7 @@ MainWindow:
     activity : activity
     picture : picture
     display_talking_scroller: display_talking_scroller
+    action : action
 
     BuildingPicture:
         id : picture
@@ -61,13 +62,12 @@ MainWindow:
 <AIImageActions>:
     action : action
     face : face
-    eyes : eyes
-    nose : nose
-    lips : lips
+    emoji : emoji
+    info : info
 
     Image:
         id : action
-        size_hint : 1 , 1
+        size_hint : 0.8 , 1
         pos_hint : { 'center_x' : 0.5 , 'center_y': 0.5 }
         source : root.image
         allow_stretch : True
@@ -76,36 +76,28 @@ MainWindow:
     BoxLayout:
         id : face
         size_hint : 0.43 , 0.4
-        pos_hint : { "center_x" : 0.5 , "center_y" : 0.63 }
+        pos_hint : { "center_x" : 0.5 , "center_y" : 0.65 }
         orientation : 'vertical'
-        spacing : 0
 
         Label:
-            id : eyes
-            #text : " ^       ^ "
-            font_size : min(self.size) * 0.9
+            id : emoji
+            size_hint : 1 , 1
             color : chex("620609")
             halign : 'center'
-            markup : True
-            bold : True
-            outline_width : 1
-        Label:
-            id : nose
-            #text : "|"
-            font_size : min(self.size) * 0.9
-            color : chex("620609")
-            halign : 'center'
-            markup : True
-            outline_width : 0.5
-        Label:
-            id : lips
-            #text : "------"
-            font_size : min(self.size) * 0.9
-            color : chex("620609")
-            halign : 'center'
-            markup : True
-            bold : True
-            outline_width : 1
+            font_name : "emoji_font"
+
+            on_size:
+                self.font_size = min(self.size) * 0.6
+
+    Label:
+        id : info
+        size_hint : 0.43 , 0.1
+        pos_hint : { "center_x" : 0.5 , "center_y" : 0.445 }
+        color : chex("620609")
+        font_name : 'title_font'
+
+        on_size:
+            self.font_size = min(self.size) * 0.7
 
 
 # ------------------- Login Viewer ------------

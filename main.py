@@ -17,7 +17,9 @@ from kivy.core.text import LabelBase
 from kivy.clock import Clock
 
 from threading import Thread
-import os, pickle, json , typing
+import os, pickle, json , typing , random
+
+os.environ['KIVY_TEXT'] = 'pil' # Use to handle big font size
 
 from content_screens import GuestScreen, FacultyScreen, DeveloperScreen
 
@@ -26,12 +28,54 @@ class AIImageActions(MDRelativeLayout):
     image : str = StringProperty(os.path.join(os.path.dirname(__file__), 'pictures', 'oc robot.png'))
     action : Image = ObjectProperty(None)
     face : MDRelativeLayout = ObjectProperty(None)
-    eyes : Label = ObjectProperty(None)
-    nose : Label = ObjectProperty(None)
-    lips : Label = ObjectProperty(None)
+    emoji : Label = ObjectProperty(None)
+    info : Label = ObjectProperty(None)
 
-    def moveTheEyes(self):
-        pass
+    activities = {
+        'sleep' : (
+            ('s' , 'SLEEPING') ,("T", "STILL SLEEP" ), ('3' , "TIRED" ),
+            ('z' , "WAKING UP")
+        ),
+        'talk' : (
+            ('y' , 'HAPPY TALKING') , ('w' , 'DOUBTING') , ('l', "YOUR RIGHT"),
+            ('n' , 'CORRECT') , ("7" , "HAHA") , ("L", "THAT'S RIGHT"),
+            ('Z' , "MAYBE")
+        ),
+        'listen' : (
+            ( 'O' , 'LISTENING') , ('p' , 'UNDERSTANDING') , ('d' , "WOW"),
+            ('h' , 'SERIOUSLY') , ('j' , "WHAT!!") , ('5' , "OKEY.."),
+            ("8", "I LISTEN.") , ("E" , "SHOCK"), ("D", "BLUSH") ,
+            ("F", "RIGHT"),("J", "CAN'T BELIEVE"), ("X" , "SURE?"),
+            ("M" , "WHAT EVER")
+        ),
+        'nothing' : (
+            ('4' , "NOTHING") , ( '6' , "SILENT") , ("0", "QUITE"),
+            ("W", "CRAZY") , ("R", "LAUGHING"), ("U", "BLEEE") ,
+            ('A', "GLAD"), ("G","GREEEE!!") , ("V", "SHHHHHH")
+        )
+    }
+    __speed = 3
+    __mood = "sleep"
+
+    def nothingMood(self):
+        self.__mood = "nothing"
+
+    def talkingMood(self):
+        self.__mood = "talk"
+
+    def listeningMood(self):
+        self.__mood = "listen"
+
+    def sleepMood(self):
+        self.__mood = "sleep"
+
+    def animateFace(self , *args):
+        pos = random.randint(1 , len(self.activities[self.__mood])) - 1
+        emoji , info = self.activities[self.__mood][pos]
+        print(f"{self.__mood} : {pos} = {emoji},{info}")
+        self.emoji.text = emoji
+        self.info.text = info
+        Clock.schedule_once(self.animateFace , self.__speed)
 
 
 class LogInView(ModalView):
@@ -86,6 +130,7 @@ class MainWindow(FloatLayout) :
     display_talking: Label = ObjectProperty(None)
     content: ContentWindow = ObjectProperty(None)
     activity : Label = ObjectProperty(None)
+    action : AIImageActions = ObjectProperty(None)
 
     size_effect = NumericProperty(5.0)
     stop_all_running = BooleanProperty(False)
@@ -130,6 +175,10 @@ class MainWindow(FloatLayout) :
     def instructor_filename(self) -> tuple[str, str]:
         return self.__instructor_filename
 
+    @property
+    def facultySecurity(self) -> tuple[str , str]:
+        return self.__system_data['faculty']
+
     @staticmethod
     def loadNeededData( filename: str, folder=None, isBytes=False) -> dict :
         filepath = os.path.join(os.path.dirname(__file__), folder, filename) if folder else os.path.join(
@@ -139,7 +188,7 @@ class MainWindow(FloatLayout) :
 
     @staticmethod
     def saveNewData( filename : str, data : dict, folder = None , isBytes = False):
-        filepath = os.path.join(os.path.dirname(__file__), filename, folder) if folder else os.path.join(
+        filepath = os.path.join(os.path.join(os.path.dirname(__file__),folder) ,filename) if folder else os.path.join(
             os.path.dirname(__file__), filename)
         with open(filepath, 'wb' if isBytes else 'w') as file :
             return json.dump(data, file, indent=4) if not isBytes else pickle.dump(data, file)
@@ -155,10 +204,18 @@ class MainWindow(FloatLayout) :
 
         self.command_handler.updateCommand(self.__commands_pattern.copy() , self.__commands_metadata.copy())
 
+    def updateFacultySecurity(self, username : str , password : str ):
+        self.__system_data['faculty'] = (username , password)
+        print(self.__system_data)
+
+    def saveImportantData(self):
+        self.saveNewData(filename=self.__system_filename[0] , data=self.__system_data , folder=self.__system_filename[1] , isBytes=True)
+
     def on_kv_post(self, base_widget):
         self.ids['picture'].ids['picture'].source = os.path.join(os.path.dirname(__file__), 'pictures', 'building.jpg')
         self.scrolling_clock = Clock.schedule_interval(self.updateScrolling , 1/30)
         self.user_command_clock = Clock.schedule_interval(self.checkUserCommands , 1 / 30)
+        self.action.animateFace()
 
     def close(self):
         self.stop_all_running = True
@@ -269,6 +326,8 @@ class MainWindow(FloatLayout) :
 class RoomAIApp(MDApp) :
 
     def on_stop(self):
+        self.root.saveImportantData()
+
         self.profile.disable()
         self.profile.dump_stats('oc ai.profile')
         self.root.close()
@@ -290,6 +349,7 @@ if __name__ == "__main__" :
     LabelBase.register(name="title_font" , fn_regular=os.path.join(os.path.dirname(__file__), 'fonts', 'OpenSans-Bold.ttf'))
     LabelBase.register(name="content_font" , fn_regular=os.path.join(os.path.dirname(__file__), 'fonts', 'OpenSans-Regular.ttf'))
     LabelBase.register(name="ai_eye" , fn_regular=os.path.join(os.path.dirname(__file__), 'fonts', 'Kablokhead-xxY5.ttf'))
+    LabelBase.register(name="emoji_font", fn_regular=os.path.join(os.path.dirname(__file__), 'fonts', 'GoogleEmojis-Regular.ttf'))
     try :
         RoomAIApp().run()
     except Exception as e:
