@@ -35,7 +35,7 @@ def loadMainWindowData(self) -> typing.NoReturn :
 
 def recognizeAlgo(self: object) -> typing.NoReturn :
 
-    return  # TODO: Debugging Only For UI
+    # return  # TODO: Debugging Only For UI
 
     from .recognizer import AIMouth, AIEar
     ear = AIEar()
@@ -60,15 +60,18 @@ def recognizeAlgo(self: object) -> typing.NoReturn :
     # TODO: create a loop variables
     person_found = []
     room_found = []
-    self.activity.text = "LISTENING"
 
     print("Start Main Activity".center(40, "-"))
     while not self.stop_all_running :  # Main Loop
 
+        print(f"Current Screen : {self.content.selected_screen}")
         # TODO: Check if the current screen is faculty, then do not record
-        if self.content.current == "faculty" :
+        if self.content.isFacultyScreen() or self.content.isDevScreen():
             self.activity.text = "SILENT"
             continue
+        else:
+            self.activity.text = "LISTENING"
+
 
         # TODO: Check if current recording
         if not self.cancelRecording:
@@ -151,7 +154,7 @@ def recognizeAlgo(self: object) -> typing.NoReturn :
                     self.updateAITalking(data['directions'][0] , data['directions'][1])
                     # BackEnd action
                     mouth.talk(data["directions"][0])
-                    self.doneTalking(True)
+                    self.doneTalking()
                     # mouth.talk("Do you want to know what is this building? say yes")
                     # self.activity.text = "LISTENING"
                     # asked = ear.captureVoice(3)
@@ -173,7 +176,7 @@ def recognizeAlgo(self: object) -> typing.NoReturn :
                     self.updateAITalking(data['directions'][0], data['directions'][1])
                     # BackEnd action
                     mouth.talk(data["directions"][0])
-                    self.doneTalking(True)
+                    self.doneTalking()
                     # mouth.talk("Do you want to know what is this building? say yes")
                     # self.activity.text = "LISTENING"
                     # asked = ear.captureVoice(3)
@@ -192,7 +195,7 @@ def recognizeAlgo(self: object) -> typing.NoReturn :
                 self.updateAITalking("You are talking about the location in the building or a instructor but I cant understand clearly please repeat it", 7)
                 mouth.talk(
                     "You are talking about the location in the building or a instructor but I cant understand clearly please repeat it")
-                self.doneTalking(True)
+                self.doneTalking()
 
             person_found.clear()
             room_found.clear()
@@ -204,7 +207,7 @@ def recognizeAlgo(self: object) -> typing.NoReturn :
             self.updateAITalking(
                 "My functions only guiding the location in this building, I cant cope what are you talking.", 4)
             mouth.talk("My functions only guiding the location in this building, I cant cope what are you talking")
-            self.doneTalking(True)
+            self.doneTalking()
             intent = "invalid"
 
         saveText(file, intent, text)
