@@ -42,7 +42,7 @@ class AIImageActions(MDRelativeLayout):
             ('Z' , "MAYBE")
         ),
         'listen' : (
-            ( 'O' , 'LISTENING') , ('p' , 'UNDERSTANDING') , ('d' , "WOW"),
+            ( 'O' , 'LISTENING') , ('p' , 'UNDERSTAND') , ('d' , "WOW"),
             ('h' , 'SERIOUSLY') , ('j' , "WHAT!!") , ('5' , "OKEY.."),
             ("8", "I LISTEN.") , ("E" , "SHOCK"), ("D", "BLUSH") ,
             ("F", "RIGHT"),("J", "CAN'T BELIEVE"), ("X" , "SURE?"),
@@ -57,22 +57,21 @@ class AIImageActions(MDRelativeLayout):
     __speed = 3
     __mood = "sleep"
 
-    def nothingMood(self):
-        self.__mood = "nothing"
+    emotions = { '' : 'sleep' , 'TALKING' : 'talk' , 'LISTENING' : 'listen' , 'SILENT' : 'nothing' }
 
-    def talkingMood(self):
-        self.__mood = "talk"
+    def changeFace(self, mood : str ):
 
-    def listeningMood(self):
-        self.__mood = "listen"
+        mood = self.emotions.get(mood , None)
 
-    def sleepMood(self):
-        self.__mood = "sleep"
+        if mood is None:
+            return
+
+        self.__mood = mood
 
     def animateFace(self , *args):
         pos = random.randint(1 , len(self.activities[self.__mood])) - 1
         emoji , info = self.activities[self.__mood][pos]
-        print(f"{self.__mood} : {pos} = {emoji},{info}")
+        # print(f"{self.__mood} : {pos} = {emoji},{info}")
         self.emoji.text = emoji
         self.info.text = info
         Clock.schedule_once(self.animateFace , self.__speed)
@@ -114,15 +113,27 @@ class LogInView(ModalView):
 
 class ContentWindow(ScreenManager) :
     listOfScreen = { 'guest' : GuestScreen , 'faculty' : FacultyScreen , 'dev' : DeveloperScreen}
+    selected_screen : str = StringProperty("")
 
     def on_parent(self, *args) :
-        screen = self.listOfScreen['faculty']()
+        screen = self.listOfScreen['guest'](name='guest')
+        self.selected_screen = screen.name
         self.switch_to(screen)
 
     def switchScreenByName(self, name : str):
+        self.selected_screen = name
         current_screen = self.current_screen
-        self.switch_to(self.listOfScreen[name]())
+        self.switch_to(self.listOfScreen[name](name=name))
         self.remove_widget(current_screen)
+
+    def isGuestScreen(self) -> bool:
+        return self.selected_screen == "guest"
+
+    def isFacultyScreen(self) -> bool:
+        return self.selected_screen == "faculty"
+
+    def isDevScreen(self) -> bool:
+        return self.selected_screen == "dev"
 
 
 class MainWindow(FloatLayout) :
@@ -257,6 +268,10 @@ class MainWindow(FloatLayout) :
         self.login.dismiss()
 
     def checkUserCommands(self, *args) -> typing.NoReturn:
+
+        # change the animation of AI Face
+        self.action.changeFace(self.activity.text)
+
         # Check if there is any update
         if not self.command_handler.isThisCurrentCommand(command=self.__current_command):
             return
@@ -287,8 +302,8 @@ class MainWindow(FloatLayout) :
     def updateAIText(self, text : str):
         self.__ai_talking = text
 
-    def doneTalking(self , for_guest : bool):
-        if for_guest :
+    def doneTalking(self):
+        if self.content.isGuestScreen() :
             self.content.current_screen.okeyToChangeScreen()
 
     # ---------------------- READING DATA ------------------------------
