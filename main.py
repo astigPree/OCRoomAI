@@ -115,10 +115,17 @@ class ContentWindow(ScreenManager) :
     listOfScreen = { 'guest' : GuestScreen , 'faculty' : FacultyScreen , 'dev' : DeveloperScreen}
     selected_screen : str = StringProperty("")
 
-    def on_parent(self, *args) :
+    def loading(self, *args):
         screen = self.listOfScreen['guest'](name='guest')
+        # screen = self.listOfScreen['faculty'](name='faculty')
         self.selected_screen = screen.name
         self.switch_to(screen)
+
+    def on_parent(self, *args) :
+        screen = self.listOfScreen['dev'](name='dev')
+        self.selected_screen = screen.name
+        self.switch_to(screen)
+        Clock.schedule_once(self.loading)
 
     def switchScreenByName(self, name : str):
         self.selected_screen = name
@@ -343,14 +350,14 @@ class RoomAIApp(MDApp) :
     def on_stop(self):
         self.root.saveImportantData()
 
-        self.profile.disable()
-        self.profile.dump_stats('oc ai.profile')
-        self.root.close()
+        # self.profile.disable()
+        # self.profile.dump_stats('oc ai.profile')
+        # self.root.close()
 
     def on_start(self):
-        import cProfile
-        self.profile = cProfile.Profile()
-        self.profile.enable()
+        # import cProfile
+        # self.profile = cProfile.Profile()
+        # self.profile.enable()
 
         Thread(target=self.root.recognizeAlgo).start()
 

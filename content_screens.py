@@ -385,15 +385,18 @@ class SettingScreen(Screen):
 
     def changeRoom(self , name : str):
         self.dropdown_button.text = name
-
-        for key , values in self.__room_data.items():
-            if values['name'] == name:
-                self.__past_text = values['brief information'][0]
-                self.data_input.text = values['brief information'][0]
-                self.room_picture.source = values['building picture']
-                self.__selected_room = values
-
         self.dropdown_list.dismiss()
+
+        def command(*args):
+            for key , values in self.__room_data.items():
+                if values['name'] == name:
+                    self.__past_text = values['brief information'][0]
+                    self.data_input.text = values['brief information'][0]
+                    self.__selected_room = values
+                    self.data_warning.text = ""
+                    self.room_picture.source = values['building picture']
+                    break
+        Clock.schedule_once(command )
 
     def goBackToMainScreen(self):
         def command():
@@ -577,11 +580,11 @@ class FacultyScreen(Screen) :
     def applyChanges(self , key : str , new_data : dict , isRoom = False):
         if isRoom:
             self.room_data[key] = new_data
-            folder , filename = self.parent.parent.room_filename
+            filename, folder = self.parent.parent.room_filename
             self.parent.parent.saveNewData(filename=filename , data=self.room_data , folder=folder)
         else:
             self.instructor_data[key] = new_data
-            folder , filename = self.parent.parent.instructor_filename
+            filename , folder = self.parent.parent.instructor_filename
             self.parent.parent.saveNewData(filename=filename , data=self.instructor_data , folder=folder)
             self.update_navigation_content()
 
@@ -848,7 +851,7 @@ class GuestScreen(Screen) :
     def animate(self , *args):
         self.index_of_screen = self.index_of_screen + 1 if (self.index_of_screen + 1) < len(self.screens_names) else 0
         self.screens_handler.current = self.screens_names[self.index_of_screen]
-        self.changing_screen_event =Clock.schedule_once(self.animateChangingScreens , self.__changing_speed)
+        self.changing_screen_event = Clock.schedule_once(self.animateChangingScreens , self.__changing_speed)
 
     def animateChangingScreens(self , *args) :
         if self.__okey_to_animate :
