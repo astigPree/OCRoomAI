@@ -1,53 +1,60 @@
 {
     "justine": {
-        "person": "Justine Aban",
-        "picture": "C:\\Users\\63948\\Desktop\\PyProg\\OC Room AI UI\\pictures\\my_picture.jpg",
+        "person": "Sir Justine R. Aban",
+        "picture": "C:\\Users\\63948\\Desktop\\PyProg\\OC Room AI UI\\pictures\\Sir Justin Aban.jpg",
         "information": "    Teacher who is also a software engineer is an individual with a unique combination of skills and expertise. This person typically possesses a background in software engineering, which includes knowledge of programming languages, software development methodologies, and a deep understanding of computer science principles.",
         "locations": {
-            "501": [
-                "10:00:00-11:00:00/3"
-            ],
-            "506": ["00:00:00-02:00:00/2"],
-            "502": [
-                "10:00:00-11:00:00/6"
-            ]
+            "501": [],
+            "506": [],
+            "502": [],
+            "505": []
         }
     },
     "norle": {
-        "person": "Sir. Norle Magcayan",
-        "picture": "picture path",
+        "person": "Mr. Norle Magcayan",
+        "picture": "C:\\Users\\63948\\Desktop\\PyProg\\OC Room AI UI\\pictures\\Sir Norle Magcayan.jpg",
         "information": "    As a Master Programming Instructor, this individual stands as an expert in a wide array of programming languages, frameworks, and software development methodologies. With a deep and versatile understanding of programming, they bring a wealth of knowledge and practical experience to the classroom.",
         "locations": {
+            "radio": [
+                "13:00:00-14:00:00/2"
+            ],
+            "501": [],
             "avr": [],
-            "501": []
+            "507": [
+                "10:00:00-12:00:00/1"
+            ]
         }
     },
     "joel": {
-        "person": "Sir Joel Salidaga",
-        "picture": "picture path",
+        "person": "Mr. Joel Salidaga",
+        "picture": "C:\\Users\\63948\\Desktop\\PyProg\\OC Room AI UI\\pictures\\Sir Joel Salidaga.jpg",
         "information": "    As a Computer Hardware Instructor, this individual possesses a deep understanding of the intricate components that form the foundation of computing systems. Their expertise extends to the design, assembly, maintenance, and troubleshooting of computer hardware. With a passion for sharing this knowledge, the instructor plays a crucial role in preparing students for careers in CSIT, computer engineering, and related fields.",
         "locations": {}
     },
     "anave": {
         "person": "Mrs. Jessica Anave",
-        "picture": "picture path",
+        "picture": "C:\\Users\\63948\\Desktop\\PyProg\\OC Room AI UI\\pictures\\Maam Jessica Anave.jpg",
         "information": "    As a Software Tools Instructor, this individual is a specialist in guiding students through the effective utilization of various software tools that are integral to the field of technology and software development. With a keen understanding of the practical applications of these tools, the instructor equips students with the skills necessary for efficient workflow and project development.",
         "locations": {
-            "locations": [],
-            "information": [],
             "picture": [],
-            "person": []
+            "locations": [],
+            "person": [],
+            "information": []
         }
     },
     "viole": {
-        "person": "Violeta Monticalvo",
-        "picture": "picture path",
+        "person": "Engr. Violeta Monticalvo",
+        "picture": "C:\\Users\\63948\\Desktop\\PyProg\\OC Room AI UI\\pictures\\Maam Violeta Monticalvo 1.jpg",
         "information": "    A teacher who holds the positions of a dean and Thesis Instructor, this professional embodies a unique blend of administrative leadership and hands-on academic engagement. Operating at the intersection of institutional governance and student mentorship, they play a pivotal role in shaping both the administrative policies and the academic experiences of students, particularly in the realm of thesis work. ",
-        "locations": {}
+        "locations": {
+            "510": [
+                "10:00:00-11:00:00/3"
+            ]
+        }
     },
     "lai": {
         "person": "Ms. Laila Deito",
-        "picture": "picture path",
+        "picture": "C:\\Users\\63948\\Desktop\\PyProg\\OC Room AI UI\\pictures\\laila.jpg",
         "information": "brief information about the instructor",
         "locations": {
             "502": [
@@ -57,11 +64,14 @@
     },
     "jov": {
         "person": "Ms. Jovelyn Patalinghug",
-        "picture": "picture path",
+        "picture": "C:\\Users\\63948\\Desktop\\PyProg\\OC Room AI UI\\pictures\\Maam Jov Patalinghug.jpg",
         "information": "brief information about the instructor",
         "locations": {
             "501": [
                 "09:00:00-11:00:00/5"
+            ],
+            "502": [
+                "10:00:00-11:00:00/4"
             ]
         }
     },
